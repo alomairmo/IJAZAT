@@ -22,20 +22,22 @@
             --success: #27ae60;
             --danger: #e74c3c;
             --danger-dark: #c0392b;
-            --dome-green: #007A3D;
+            --dome-green: #007A3D; /* أخضر القبة الشريفة */
             --bg-color: #f4f7f6;
             --surface: #ffffff;
             --text-main: #333333;
             --text-muted: #7f8c8d;
             
-            --cert-pt: 31.108%;
+            /* هوامش الإجازة الديناميكية */
+            --cert-pt: 31.108%; /* 22 * 1.414 */
             --cert-pr: 10%;
-            --cert-pb: 12.019%;
+            --cert-pb: 12.019%; /* 8.5 * 1.414 */
             --cert-pl: 10%;
         }
 
         body { font-family: 'Tajawal', sans-serif; margin: 0; height: 100vh; background-color: var(--bg-color); overflow: hidden; color: var(--text-main); display: flex; flex-direction: column; }
 
+        /* 1. الشريط العلوي الثابت */
         .dome-header { background-color: var(--dome-green); color: white; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 20; flex-shrink: 0; }
         .header-right { display: flex; align-items: center; gap: 15px; }
         .header-right h1 { margin: 0; font-size: 1.6rem; font-weight: 700; white-space: nowrap;}
@@ -48,7 +50,7 @@
 
         #appContainer { display: flex; flex-grow: 1; overflow: hidden; width: 100%; }
 
-        /* Drive View */
+        /* 2. الخزانة (Drive View) */
         #driveView { width: 100%; display: flex; flex-direction: column; height: 100%; overflow-y: auto; scroll-behavior: smooth; }
         .search-container { background: var(--surface); padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; border-bottom: 1px solid #ddd; }
         .search-controls-wrapper { display: flex; gap: 15px; width: 100%; max-width: 800px; justify-content: center; align-items: center; flex-wrap: wrap; }
@@ -74,7 +76,7 @@
         .global-certs-section { margin-top: 40px; padding-top: 20px; border-top: 2px dashed #eaeaea; }
         .global-certs-section h3 { color: var(--primary); margin-bottom: 20px; font-size: 1.3rem;}
 
-        /* Workspace View */
+        /* 3. مساحة العمل (Workspace View) */
         #workspaceView { display: none; width: 100%; height: 100%; }
         .sidebar { width: 320px; min-width: 320px; background: var(--surface); padding: 20px; box-shadow: -2px 0 10px rgba(0,0,0,0.05); overflow-y: auto; z-index: 10; display: flex; flex-direction: column; scroll-behavior: smooth;}
         .sidebar h2 { font-size: 1.2rem; color: var(--primary); border-bottom: 2px solid var(--dome-green); padding-bottom: 10px; margin-top: 0; font-weight: 700;}
@@ -184,7 +186,7 @@
         .preview-box { border: 1px dashed #ccc; padding: 10px; border-radius: 6px; margin-top: 10px; text-align: center; background: #fafafa; }
         .preview-img { max-width: 100%; max-height: 100px; object-fit: contain; }
 
-        /* Switches */
+        /* Switches & Buttons */
         .insert-btns-container { display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; }
         .btn-insert { background: #ecf0f1; border: 1px solid #dcdde1; border-radius: 4px; padding: 5px 10px; font-size: 0.8rem; cursor: pointer; color: var(--primary); font-family: inherit; font-weight: bold; transition: 0.2s; }
         .btn-insert:hover { background: #d5dbdb; color: var(--dome-green); border-color: var(--dome-green);}
@@ -198,6 +200,7 @@
         input:checked + .slider:before { transform: translateX(16px); }
         .slider.round { border-radius: 20px; }
         .slider.round:before { border-radius: 50%; }
+
         /* شاشة التحميل والرسائل */
         #loadingOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.9); color: var(--primary); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; font-size: 1.5rem; font-weight: bold; }
         .spinner { border: 5px solid #f3f3f3; border-top: 5px solid var(--dome-green); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
@@ -237,6 +240,7 @@
 
     <div id="toast">تمت العملية بنجاح</div>
 
+    <!-- مكونات الجولة التعليمية -->
     <div id="tutorialOverlay" class="tutorial-overlay-bg"></div>
     <div id="tutorialTooltip" class="tutorial-tooltip">
         <h4 id="tutorialTitle">💡 معلومة</h4>
@@ -247,7 +251,7 @@
         </div>
     </div>
 
-    <!-- Modals -->
+    <!-- النوافذ المنبثقة -->
     <div id="deleteModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 350px;">
             <h3 style="color: var(--danger); border-bottom: none;">تأكيد الحذف</h3>
@@ -394,7 +398,7 @@
         </div>
     </div>
 
-    <!-- Header -->
+    <!-- الشريط العلوي -->
     <header class="dome-header" id="mainHeader">
         <div class="header-right">
             <button class="icon-btn" id="btnBackHeader" onclick="goBackToDrive()" style="display:none;" title="العودة للخزانة">➔</button>
@@ -406,9 +410,10 @@
         </div>
     </header>
 
-    <!-- Main Container -->
+    <!-- حاوية التطبيق -->
     <div id="appContainer">
-        <!-- Drive View -->
+        
+        <!-- مساحة الخزانة مع البحث الشامل -->
         <div id="driveView">
             <div class="search-container" id="mainSearchContainer">
                 <div class="search-controls-wrapper">
@@ -434,6 +439,7 @@
             
             <div class="folders-container" id="driveScrollArea">
                 <div class="folders-grid" id="foldersGrid"></div>
+                <!-- الحاوية الديناميكية لنتائج بحث الشهادات -->
                 <div id="globalCertsSection" class="global-certs-section" style="display: none;">
                     <h3 id="globalCertsTitle">📄 إجازات مطابقة للبحث</h3>
                     <div class="certificates-grid view-compact" id="globalCertsGrid"></div>
@@ -441,7 +447,7 @@
             </div>
         </div>
 
-        <!-- Workspace View -->
+        <!-- مساحة المجلد الخاص -->
         <div id="workspaceView">
             <div class="sidebar" id="workspaceSidebar">
                 <div id="sidebarTop">
@@ -540,7 +546,7 @@
 
     <script>
         // ==========================================
-        // بيانات جولة الشرح التعليمية 
+        // بيانات جولة الشرح التعليمية مع التحديثات
         // ==========================================
         const tutorialSteps = {
             drive: [
@@ -810,16 +816,50 @@
             } catch(e) { console.warn("مساحة التخزين المحلي ممتلئة."); }
         }
 
-        function saveData() {
+        // --- التعديل الأساسي لمنع رسالة (resource-exhausted) بتجميع الطلبات ---
+        async function saveData() {
             saveLocalData(); 
             if (appDbClient) {
-                appDbClient.collection('ijazah_data').doc('settings').set({ dateLabel: globalSettings.dateLabel, sheikhDetails: globalSettings.sheikhDetails, marginTop: globalSettings.marginTop, marginBottom: globalSettings.marginBottom, marginRight: globalSettings.marginRight, marginLeft: globalSettings.marginLeft }).catch(e=>console.log(e));
-                appDbClient.collection('ijazah_data').doc('images').set({ signature: globalSettings.signatureBase64, background: globalSettings.backgroundBase64 }).catch(e=>console.log(e));
-                appDbClient.collection('ijazah_data').doc('folders').set({ list: folders }).catch(e=>console.log(e));
-                
-                sessionCertificates.forEach(cert => {
-                    appDbClient.collection('ijazah_data').doc('certs').collection('items').doc(cert.id).set(cert).catch(e=>console.log(e));
-                });
+                try {
+                    // تحديث الإعدادات والمجلدات
+                    appDbClient.collection('ijazah_data').doc('settings').set({ 
+                        dateLabel: globalSettings.dateLabel, sheikhDetails: globalSettings.sheikhDetails, 
+                        marginTop: globalSettings.marginTop, marginBottom: globalSettings.marginBottom, 
+                        marginRight: globalSettings.marginRight, marginLeft: globalSettings.marginLeft 
+                    }).catch(e=>console.log(e));
+                    
+                    appDbClient.collection('ijazah_data').doc('images').set({ 
+                        signature: globalSettings.signatureBase64, background: globalSettings.backgroundBase64 
+                    }).catch(e=>console.log(e));
+                    
+                    appDbClient.collection('ijazah_data').doc('folders').set({ list: folders }).catch(e=>console.log(e));
+                    
+                    // استخدام الـ Batch لرفع الشهادات منعاً لاختناق السيرفر
+                    let batches = [];
+                    let currentBatch = appDbClient.batch();
+                    let opCount = 0;
+
+                    sessionCertificates.forEach(cert => {
+                        let docRef = appDbClient.collection('ijazah_data').doc('certs').collection('items').doc(cert.id);
+                        currentBatch.set(docRef, cert);
+                        opCount++;
+                        
+                        // الحد الأقصى للـ Batch في فايربيس هو 500 عملية
+                        if (opCount === 400) {
+                            batches.push(currentBatch);
+                            currentBatch = appDbClient.batch();
+                            opCount = 0;
+                        }
+                    });
+                    
+                    if (opCount > 0) batches.push(currentBatch);
+                    
+                    for (let batch of batches) {
+                        await batch.commit();
+                    }
+                } catch(e) {
+                    console.error("خطأ أثناء المزامنة السحابية: ", e);
+                }
             }
         }
 
@@ -1020,7 +1060,6 @@
             executeGlobalSearchAndSort(); openFolder(newFolder.id); 
         }
 
-        // التعديل الرئيسي لمنع ظهور رسالة الخطأ updateHeaderMode null
         function updateHeaderMode(mode, folderName = "") {
             const headerTitle = document.getElementById('headerTitle');
             if (headerTitle) headerTitle.innerText = mode === 'drive' ? "خزانة الإجازات" : folderName;
@@ -1170,11 +1209,40 @@
 
         function confirmDelete() { if (document.querySelectorAll('.delete-checkbox:checked').length === 0) return showToast("حدد إجازة واحدة على الأقل.", true); document.getElementById('deleteModal').style.display = 'flex'; }
 
-        function executeDelete() {
+        // --- تعديل الحذف ليعمل بنظام المجموعات Batch ---
+        async function executeDelete() {
             closeModal('deleteModal');
             const selectedIds = Array.from(document.querySelectorAll('.delete-checkbox:checked')).map(cb => cb.value);
             sessionCertificates = sessionCertificates.filter(c => !selectedIds.includes(c.id));
-            if (appDbClient) { selectedIds.forEach(id => { appDbClient.collection('ijazah_data').doc('certs').collection('items').doc(id).delete().catch(e=>console.log(e)); }); }
+            
+            if (appDbClient) {
+                try {
+                    let batches = [];
+                    let currentBatch = appDbClient.batch();
+                    let opCount = 0;
+                    
+                    selectedIds.forEach(id => {
+                        let docRef = appDbClient.collection('ijazah_data').doc('certs').collection('items').doc(id);
+                        currentBatch.delete(docRef);
+                        opCount++;
+                        
+                        if (opCount === 400) {
+                            batches.push(currentBatch);
+                            currentBatch = appDbClient.batch();
+                            opCount = 0;
+                        }
+                    });
+                    
+                    if (opCount > 0) batches.push(currentBatch);
+                    
+                    for (let batch of batches) {
+                        await batch.commit();
+                    }
+                } catch(e) {
+                    console.error("خطأ في الحذف: ", e);
+                }
+            }
+
             cancelSelectMode(); renderWorkspaceCerts(); saveLocalData(); showToast("تم الحذف بنجاح.");
         }
 
@@ -1194,19 +1262,33 @@
             closeModal('moveModal'); cancelSelectMode(); renderWorkspaceCerts(); saveData(); showToast("تم نقل الملفات بنجاح!");
         }
 
+        // --- تعديل رفع الـ PDF ليقوم بالحفظ فقط بعد انتهاء جميع الملفات ---
         function handleOldPdfUpload(event) {
             const files = event.target.files; if (!files || files.length === 0) return;
+            
+            let processedCount = 0;
+            
             Array.from(files).forEach(file => {
-                if (file.type !== "application/pdf") return showToast("الرجاء رفع ملف PDF فقط", true);
+                if (file.type !== "application/pdf") {
+                    showToast("الرجاء رفع ملف PDF فقط", true);
+                    processedCount++;
+                    if(processedCount === files.length) saveData();
+                    return;
+                }
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const certId = 'cert_' + Date.now() + '_' + Math.floor(Math.random()*1000);
                     const name = file.name.replace('.pdf', '');
                     const innerHTML = `<input type="checkbox" class="delete-checkbox" value="${certId}"><span class="badge uploaded-badge" id="badge_${certId}">مرفق قديم</span><div class="cert-thumbnail"><svg viewBox="0 0 24 24"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"/></svg><span class="cert-thumbnail-label">ملف PDF مرفوع</span></div><div class="cert-info"><div class="cert-name" title="${name}">${name}</div><div class="cert-date">${new Date().toLocaleDateString('ar-SA')}</div><div class="individual-download-btns"><button class="btn-action btn-single btn-download-red" onclick="downloadSingle('${certId}', 'pdf')">تحميل الملف</button></div></div>`;
                     sessionCertificates.push({ id: certId, folderId: currentFolderId, studentName: name, timestamp: Date.now(), isUploadedPdf: true, pdfDataUrl: e.target.result, cardInnerHTML: innerHTML, downloadedStatus: [] });
-                    renderWorkspaceCerts(); showToast("تم إرفاق الملف بنجاح!"); saveData();
-                }; reader.readAsDataURL(file);
-            }); event.target.value = '';
+                    renderWorkspaceCerts(); showToast("تم إرفاق الملف بنجاح!");
+                    
+                    processedCount++;
+                    if(processedCount === files.length) saveData(); // حفظ مجمّع
+                }; 
+                reader.readAsDataURL(file);
+            }); 
+            event.target.value = '';
         }
 
         function generateCertificates() {
@@ -1253,12 +1335,14 @@
         function downloadDataUrl(dataUrl, filename) { const link = document.createElement("a"); link.href = dataUrl; link.download = filename; link.click(); }
         function base64ToBlob(base64, mimeType) { const parts = base64.split(';base64,'); const decodedData = window.atob(parts[1]); const uInt8Array = new Uint8Array(decodedData.length); for (let i = 0; i < decodedData.length; ++i) { uInt8Array[i] = decodedData.charCodeAt(i); } return new Blob([uInt8Array], { type: mimeType }); }
         
-        function markAsDownloaded(cardId, type) {
+        // --- تعديل لتمكين تخطي الحفظ المتكرر ---
+        function markAsDownloaded(cardId, type, skipSave = false) {
             const cert = sessionCertificates.find(c => c.id === cardId);
             if (cert) {
                 if (!cert.downloadedStatus) cert.downloadedStatus = [];
                 if (!cert.downloadedStatus.includes(type)) cert.downloadedStatus.push(type);
-                saveData(); 
+                
+                if (!skipSave) saveData(); 
                 
                 const badges = document.querySelectorAll(`#global_${cardId} .badge, #${cardId} .badge`);
                 badges.forEach(b => {
@@ -1283,7 +1367,7 @@
 
             if (student.isUploadedPdf) { 
                 downloadDataUrl(student.pdfDataUrl, fileName); 
-                markAsDownloaded(actualId, 'pdf'); 
+                markAsDownloaded(actualId, 'pdf', false); 
                 if (wasCompact) grid.classList.add('view-compact'); 
                 return; 
             }
@@ -1302,7 +1386,7 @@
                 if (type === 'pdf') { const { jsPDF } = window.jspdf; const pdf = new jsPDF('p', 'mm', 'a4'); pdf.addImage(canvas.toDataURL('image/jpeg', 1.0), 'JPEG', 0, 0, 210, 297); pdf.save(fileName); } 
                 else { canvas.toBlob((blob) => { saveAs(blob, fileName); }, 'image/png'); }
                 
-                markAsDownloaded(actualId, type);
+                markAsDownloaded(actualId, type, false);
                 showToast(`تم التحميل لـ ${student.studentName}`);
             } catch (e) { showToast("حدث خطأ.", true); } finally { if (wasCompact) grid.classList.add('view-compact'); toggleLoading(false); }
         }
@@ -1326,16 +1410,16 @@
                         const student = sessionCertificates.find(c => c.id === certId);
                         const fileBaseName = `${folderNameStr} - ${student.studentName}`;
                         
-                        if (student.isUploadedPdf) { folderZip.file(getSafeFilename(fileBaseName, 'pdf'), base64ToBlob(student.pdfDataUrl, 'application/pdf')); markAsDownloaded(certId, 'pdf'); continue; }
+                        if (student.isUploadedPdf) { folderZip.file(getSafeFilename(fileBaseName, 'pdf'), base64ToBlob(student.pdfDataUrl, 'application/pdf')); markAsDownloaded(certId, 'pdf', true); continue; }
                         const template = document.getElementById(certId).querySelector('.ijazah-template');
                         const scale = Math.min(5, Math.max(2, 1600 / (template.clientWidth || 400)));
                         const canvas = await html2canvas(template, { scale: scale, useCORS: true, logging: false });
                         if (type === 'pdf') { const { jsPDF } = window.jspdf; const pdf = new jsPDF('p', 'mm', 'a4'); pdf.addImage(canvas.toDataURL('image/jpeg', 0.98), 'JPEG', 0, 0, 210, 297); folderZip.file(getSafeFilename(fileBaseName, 'pdf'), pdf.output('blob')); } 
                         else { const blob = await new Promise(r => canvas.toBlob(r, 'image/png')); folderZip.file(getSafeFilename(fileBaseName, 'png'), blob); }
-                        markAsDownloaded(certId, type);
+                        markAsDownloaded(certId, type, true);
                     }
                     saveAs(await zip.generateAsync({ type: 'blob' }), `${folderName}.zip`); showToast("تم التحميل بنجاح!");
-                } catch (e) { showToast("حدث خطأ.", true); } finally { if (wasCompact) grid.classList.add('view-compact'); toggleLoading(false); cancelSelectMode(); }
+                } catch (e) { showToast("حدث خطأ.", true); } finally { if (wasCompact) grid.classList.add('view-compact'); toggleLoading(false); cancelSelectMode(); saveData(); }
             } 
             else if (mode === 'single') {
                 toggleLoading(true, `جاري تحميل ${selectedIds.length} ملفات مباشرة...`);
@@ -1345,19 +1429,19 @@
                         const fileBaseName = `${folderNameStr} - ${student.studentName}`;
                         const fileName = getSafeFilename(fileBaseName, type === 'png' && student.isUploadedPdf ? 'pdf' : type);
                         
-                        if (student.isUploadedPdf) { downloadDataUrl(student.pdfDataUrl, fileName); markAsDownloaded(certId, 'pdf'); } 
+                        if (student.isUploadedPdf) { downloadDataUrl(student.pdfDataUrl, fileName); markAsDownloaded(certId, 'pdf', true); } 
                         else {
                             const template = document.getElementById(certId).querySelector('.ijazah-template');
                             const scale = Math.min(5, Math.max(2, 1600 / (template.clientWidth || 400)));
                             const canvas = await html2canvas(template, { scale: scale, useCORS: true, logging: false });
                             if (type === 'pdf') { const { jsPDF } = window.jspdf; const pdf = new jsPDF('p', 'mm', 'a4'); pdf.addImage(canvas.toDataURL('image/jpeg', 0.98), 'JPEG', 0, 0, 210, 297); pdf.save(fileName); } 
                             else { const blob = await new Promise(r => canvas.toBlob(r, 'image/png')); saveAs(blob, fileName); }
-                            markAsDownloaded(certId, type);
+                            markAsDownloaded(certId, type, true);
                         }
                         await new Promise(r => setTimeout(r, 600)); 
                     }
                     showToast("تم التحميل المباشر بنجاح!");
-                } catch (e) { showToast("حدث خطأ.", true); } finally { if (wasCompact) grid.classList.add('view-compact'); toggleLoading(false); cancelSelectMode(); }
+                } catch (e) { showToast("حدث خطأ.", true); } finally { if (wasCompact) grid.classList.add('view-compact'); toggleLoading(false); cancelSelectMode(); saveData(); }
             }
         }
     </script>
