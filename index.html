@@ -43,10 +43,13 @@
         .icon-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 8px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; width: 42px; height: 42px;}
         .icon-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
 
+        #folderSearchContainer { display: none; margin-left: 10px; transition: 0.3s; }
+        #folderSearchContainer input { padding: 8px 15px; border-radius: 20px; border: none; outline: none; width: 200px; font-family: inherit;}
+
         #appContainer { display: flex; flex-grow: 1; overflow: hidden; width: 100%; }
 
         /* Drive View */
-        #driveView { width: 100%; display: flex; flex-direction: column; height: 100%; overflow-y: auto; }
+        #driveView { width: 100%; display: flex; flex-direction: column; height: 100%; overflow-y: auto; scroll-behavior: smooth; }
         .search-container { background: var(--surface); padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; border-bottom: 1px solid #ddd; }
         .search-controls-wrapper { display: flex; gap: 15px; width: 100%; max-width: 800px; justify-content: center; align-items: center; flex-wrap: wrap; }
         .search-input-wrapper { position: relative; flex-grow: 1; max-width: 500px; min-width: 250px;}
@@ -73,7 +76,7 @@
 
         /* Workspace View */
         #workspaceView { display: none; width: 100%; height: 100%; }
-        .sidebar { width: 320px; min-width: 320px; background: var(--surface); padding: 20px; box-shadow: -2px 0 10px rgba(0,0,0,0.05); overflow-y: auto; z-index: 10; display: flex; flex-direction: column; }
+        .sidebar { width: 320px; min-width: 320px; background: var(--surface); padding: 20px; box-shadow: -2px 0 10px rgba(0,0,0,0.05); overflow-y: auto; z-index: 10; display: flex; flex-direction: column; scroll-behavior: smooth;}
         .sidebar h2 { font-size: 1.2rem; color: var(--primary); border-bottom: 2px solid var(--dome-green); padding-bottom: 10px; margin-top: 0; font-weight: 700;}
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.9rem; color: var(--primary); }
@@ -84,7 +87,7 @@
         .btn-generate { width: 100%; padding: 14px; background: var(--success); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1.1rem; font-weight: 700; margin-top: 10px; transition: 0.2s; }
         .btn-generate:hover { background: #219150; }
 
-        .main-content { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; background: var(--bg-color);}
+        .main-content { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; background: var(--bg-color); scroll-behavior: smooth;}
         .header-actions { background: var(--surface); padding: 15px 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 20px; }
         .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
         .header-top-row h2 { margin: 0; font-size: 1.3rem; color: var(--primary); }
@@ -105,9 +108,10 @@
         .certificates-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 25px; padding-bottom: 30px; }
         .cert-card { background: var(--surface); border: 2px solid transparent; border-radius: 12px; position: relative; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: 0.2s; overflow: hidden; }
         .cert-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
-        .badge { position: absolute; top: 15px; right: 15px; background: #95a5a6; color: white; font-size: 0.75rem; padding: 4px 10px; border-radius: 12px; z-index: 5; font-weight: bold; transition: background 0.3s; }
-        .badge.uploaded-badge { background: var(--primary); }
+        .cert-card .badge { position: absolute; top: 15px; right: 15px; background: #95a5a6; color: white !important; font-size: 0.75rem; padding: 4px 10px; border-radius: 12px; z-index: 5 !important; font-weight: bold !important; transition: background 0.3s; opacity: 1 !important;}
+        .cert-card .badge.uploaded-badge { background: var(--primary) !important; }
         
+        /* أدوات التحديد */
         .delete-checkbox { display: none; position: absolute; top: 15px; left: 15px; width: 22px; height: 22px; z-index: 10; cursor: pointer; accent-color: var(--success); }
         .view-select-mode .delete-checkbox { display: block; }
         .view-select-mode .cert-card { cursor: pointer; border: 2px solid #eaeaea; }
@@ -136,10 +140,11 @@
         .cert-date { font-size: 0.85rem; color: var(--text-muted); text-align: center; }
         .individual-download-btns { display: flex; gap: 10px; justify-content: center; }
         
-        /* أزرار التحميل الجديدة بدرجات الأحمر */
-        .btn-download-red { background: linear-gradient(135deg, var(--danger) 0%, var(--danger-dark) 100%); color: white; border: none; font-weight: bold; flex: 1; padding: 8px 0; text-align: center; border-radius: 6px; cursor: pointer; transition: 0.2s; font-family: inherit;}
-        .btn-download-red:hover { background: linear-gradient(135deg, var(--danger-dark) 0%, #a93226 100%); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(192, 57, 43, 0.3);}
-        .btn-download-red:active { transform: scale(0.97); }
+        /* أزرار التحميل الجديدة بدرجات الأحمر وإصلاح الشهادات القديمة */
+        .cert-info .btn-single, .btn-download-red { background: linear-gradient(135deg, var(--danger) 0%, var(--danger-dark) 100%) !important; color: white !important; border: none !important; font-weight: bold !important; flex: 1; padding: 8px 0; text-align: center; border-radius: 6px; cursor: pointer; transition: 0.2s; font-family: inherit; opacity: 1 !important;}
+        .cert-info .btn-single:hover, .btn-download-red:hover { background: linear-gradient(135deg, var(--danger-dark) 0%, #a93226 100%) !important; transform: translateY(-1px); box-shadow: 0 4px 6px rgba(192, 57, 43, 0.3) !important;}
+        .cert-info .btn-single:active, .btn-download-red:active { transform: scale(0.97); }
+        .view-select-mode .cert-info .btn-single { pointer-events: none !important; opacity: 0.4 !important; }
 
         .pdf-uploaded-card .cert-thumbnail { display: flex !important; height: 250px; background: #fdfdfd; border-bottom: 1px solid #eee; align-items: center; justify-content: center; flex-direction: column; color: var(--danger); }
         .pdf-uploaded-card .cert-thumbnail svg { width: 80px; height: 80px; margin-bottom: 15px; fill: currentColor; }
@@ -179,7 +184,7 @@
         .preview-box { border: 1px dashed #ccc; padding: 10px; border-radius: 6px; margin-top: 10px; text-align: center; background: #fafafa; }
         .preview-img { max-width: 100%; max-height: 100px; object-fit: contain; }
 
-        /* Switches & Buttons */
+        /* Switches */
         .insert-btns-container { display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; }
         .btn-insert { background: #ecf0f1; border: 1px solid #dcdde1; border-radius: 4px; padding: 5px 10px; font-size: 0.8rem; cursor: pointer; color: var(--primary); font-family: inherit; font-weight: bold; transition: 0.2s; }
         .btn-insert:hover { background: #d5dbdb; color: var(--dome-green); border-color: var(--dome-green);}
@@ -193,13 +198,23 @@
         input:checked + .slider:before { transform: translateX(16px); }
         .slider.round { border-radius: 20px; }
         .slider.round:before { border-radius: 50%; }
-
+        /* شاشة التحميل والرسائل */
         #loadingOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.9); color: var(--primary); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; font-size: 1.5rem; font-weight: bold; }
         .spinner { border: 5px solid #f3f3f3; border-top: 5px solid var(--dome-green); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 8px; padding: 16px 20px; position: fixed; z-index: 10000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
         #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+
+        /* Tutorial Overlays */
+        .tutorial-overlay-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10002; backdrop-filter: blur(2px); transition: 0.3s; }
+        .tutorial-highlight { position: relative !important; z-index: 10003 !important; border-radius: 8px; pointer-events: none; transition: all 0.3s ease; box-shadow: 0 0 0 4px var(--dome-green), 0 0 20px rgba(0,0,0,0.3) !important; background-color: transparent !important;}
+        .tutorial-tooltip { display: none; position: fixed; background: white; padding: 20px; border-radius: 12px; z-index: 10004; width: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 2px solid var(--dome-green); opacity: 0; transition: all 0.3s ease; }
+        .tutorial-tooltip.show { opacity: 1; }
+        .tutorial-tooltip::after { content: ''; position: absolute; border-width: 10px; border-style: solid; border-color: transparent transparent white transparent; top: -20px; left: 50%; transform: translateX(-50%); }
+        .tutorial-tooltip.arrow-bottom::after { border-color: white transparent transparent transparent; top: auto; bottom: -20px; }
+        .tutorial-tooltip h4 { margin-top: 0; color: var(--dome-green); font-size: 1.1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;}
+        .tutorial-content { font-size: 0.95rem; color: var(--text-main); margin-bottom: 20px; line-height: 1.6;}
 
         @media (max-width: 900px) {
             #appContainer { flex-direction: column; overflow: auto; }
@@ -208,6 +223,8 @@
             .certificates-grid { grid-template-columns: 1fr; }
             .certificates-grid.view-compact { grid-template-columns: repeat(2, 1fr); }
             .header-right h1 { font-size: 1.2rem; }
+            .search-controls-wrapper { flex-direction: column; align-items: stretch; }
+            .search-input-wrapper { max-width: 100%; }
         }
     </style>
 </head>
@@ -220,6 +237,17 @@
 
     <div id="toast">تمت العملية بنجاح</div>
 
+    <div id="tutorialOverlay" class="tutorial-overlay-bg"></div>
+    <div id="tutorialTooltip" class="tutorial-tooltip">
+        <h4 id="tutorialTitle">💡 معلومة</h4>
+        <div class="tutorial-content" id="tutorialContent">شرح الميزة...</div>
+        <div class="modal-actions" style="margin-top: 0;">
+            <button class="btn-secondary" onclick="endTutorial()" style="padding: 6px 12px; font-size: 0.85rem;">تخطي</button>
+            <button class="btn-primary" onclick="nextTutorialStep()" id="tutorialNextBtn" style="padding: 6px 12px; font-size: 0.85rem;">التالي</button>
+        </div>
+    </div>
+
+    <!-- Modals -->
     <div id="deleteModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 350px;">
             <h3 style="color: var(--danger); border-bottom: none;">تأكيد الحذف</h3>
@@ -366,23 +394,21 @@
         </div>
     </div>
 
+    <!-- Header -->
     <header class="dome-header" id="mainHeader">
         <div class="header-right">
             <button class="icon-btn" id="btnBackHeader" onclick="goBackToDrive()" style="display:none;" title="العودة للخزانة">➔</button>
             <h1 id="headerTitle">خزانة الإجازات</h1>
         </div>
         <div class="header-left">
-            <div id="folderSearchContainer">
-                <input type="text" id="folderSearchInput" placeholder="ابحث في الشهادات..." onkeyup="filterCertificates()">
-            </div>
-            <button class="icon-btn" id="btnSearchFolder" onclick="toggleFolderSearch()" style="display:none;" title="بحث في المجلد">🔍</button>
-            <button class="icon-btn" onclick="openModal('settingsModal')" title="الإعدادات العامة">⚙️</button>
+            <button class="icon-btn" id="btnTutorial" onclick="startTutorial()" title="شرح الواجهة">❓</button>
+            <button class="icon-btn" id="btnSettings" onclick="openModal('settingsModal')" title="الإعدادات العامة">⚙️</button>
         </div>
     </header>
 
+    <!-- Main Container -->
     <div id="appContainer">
-        
-        <!-- مساحة الخزانة مع البحث الشامل -->
+        <!-- Drive View -->
         <div id="driveView">
             <div class="search-container" id="mainSearchContainer">
                 <div class="search-controls-wrapper">
@@ -397,7 +423,7 @@
                         <option value="name_desc">بالاسم (تنازلي ي - أ)</option>
                     </select>
                 </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px;" id="globalSearchToggleGroup">
                     <label class="switch">
                         <input type="checkbox" id="searchInCertsToggle" checked onchange="executeGlobalSearchAndSort()">
                         <span class="slider round"></span>
@@ -408,7 +434,6 @@
             
             <div class="folders-container" id="driveScrollArea">
                 <div class="folders-grid" id="foldersGrid"></div>
-                <!-- الحاوية الديناميكية لنتائج بحث الشهادات -->
                 <div id="globalCertsSection" class="global-certs-section" style="display: none;">
                     <h3 id="globalCertsTitle">📄 إجازات مطابقة للبحث</h3>
                     <div class="certificates-grid view-compact" id="globalCertsGrid"></div>
@@ -416,32 +441,34 @@
             </div>
         </div>
 
-        <!-- مساحة المجلد الخاص -->
+        <!-- Workspace View -->
         <div id="workspaceView">
-            <div class="sidebar">
-                <h2>بيانات التوليد الجديدة</h2>
-                <div class="form-group">
-                    <label>تاريخ هذه الدفعة</label>
-                    <input type="text" id="ijazahDate" value="غرة شهر رمضان المبارك ١٤٤٧هـ">
-                </div>
-                <div class="form-group">
-                    <label>نمط إدخال الأسماء</label>
-                    <select id="nameFormat" onchange="updateInstructions()">
-                        <option value="full_and_first">الاسم الكامل + الاسم الأول (للإعراب)</option>
-                        <option value="full_only">الاسم الكامل فقط</option>
-                    </select>
-                    <div id="instructionText" class="instructions">
-                        أدخل كل طالب في سطرين:<br>السطر الأول: الاسم الكامل {الاسم الكامل}<br>السطر الثاني: الاسم الأول معرباً {الاسم الاول}
+            <div class="sidebar" id="workspaceSidebar">
+                <div id="sidebarTop">
+                    <h2>بيانات التوليد الجديدة</h2>
+                    <div class="form-group" id="dateGroup">
+                        <label>تاريخ هذه الدفعة</label>
+                        <input type="text" id="ijazahDate" value="غرة شهر رمضان المبارك ١٤٤٧هـ">
+                    </div>
+                    <div class="form-group" id="nameFormatGroup">
+                        <label>نمط إدخال الأسماء</label>
+                        <select id="nameFormat" onchange="updateInstructions()">
+                            <option value="full_and_first">الاسم الكامل + الاسم الأول (للإعراب)</option>
+                            <option value="full_only">الاسم الكامل فقط</option>
+                        </select>
+                        <div id="instructionText" class="instructions">
+                            أدخل كل طالب في سطرين:<br>السطر الأول: الاسم الكامل {الاسم الكامل}<br>السطر الثاني: الاسم الأول معرباً {الاسم الاول}
+                        </div>
                     </div>
                 </div>
-                <div class="form-group" style="flex-grow: 1; display: flex; flex-direction: column;">
+                <div class="form-group" id="studentsListGroup" style="flex-grow: 1; display: flex; flex-direction: column;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <label style="margin: 0;">أسماء المجازين</label>
                         <button class="btn-ai" onclick="formatNamesWithAI()" title="تنسيق واستخراج الأسماء من نص عشوائي باستخدام الذكاء الاصطناعي">✨ استخراج ذكي</button>
                     </div>
                     <textarea id="studentsList" style="flex-grow: 1;" placeholder="أدخل الأسماء هنا..."></textarea>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="ijazahTextGroup">
                     <label>نص الإجازة (الخاص بهذا الملف)</label>
                     <div class="insert-btns-container">
                         <button class="btn-insert" type="button" onclick="insertAtCursor('ijazahText', '{الاسم الكامل}')">الاسم كامل</button>
@@ -459,10 +486,10 @@
                         <span style="font-size: 0.85rem; font-weight: bold; color: var(--primary); margin-right: 10px;">جعل ما بين المعكوفين [ ] في الحاشية</span>
                     </div>
                 </div>
-                <button class="btn-generate" onclick="generateCertificates()">إنشاء الإجازات</button>
+                <button class="btn-generate" id="btnGenerateCerts" onclick="generateCertificates()">إنشاء الإجازات</button>
             </div>
 
-            <div class="main-content">
+            <div class="main-content" id="workspaceMainContent">
                 <div class="header-actions">
                     <div class="header-top-row">
                         <h2>محتويات المجلد</h2>
@@ -500,7 +527,9 @@
                     </div>
                     <div class="header-bottom-row" id="headerBottomRow">
                         <input type="file" id="uploadOldPdfInput" accept="application/pdf" style="display: none;" onchange="handleOldPdfUpload(event)" multiple>
-                        <button class="btn-action upload" onclick="document.getElementById('uploadOldPdfInput').click()">إرفاق PDF قديم ⬆️</button>
+                        <div id="uploadBtnContainer">
+                            <button class="btn-action upload" onclick="document.getElementById('uploadOldPdfInput').click()">إرفاق PDF قديم ⬆️</button>
+                        </div>
                     </div>
                 </div>
                 
@@ -510,6 +539,120 @@
     </div>
 
     <script>
+        // ==========================================
+        // بيانات جولة الشرح التعليمية 
+        // ==========================================
+        const tutorialSteps = {
+            drive: [
+                { target: '#mainSearchContainer', title: 'البحث الشامل 🔍', text: 'من هنا يمكنك البحث في أسماء المجلدات، وإذا فعلت خيار "البحث في الإجازات"، سيقوم النظام بالبحث عن أي طالب داخل جميع المجلدات واستخراج شهادته فوراً!' },
+                { target: '#foldersGrid', title: 'مساحة المجلدات 📁', text: 'هذه هي خزانتك الرئيسية. انقر على "ملف جديد" لإنشاء مجلد لكتاب جديد، أو انقر على أي مجلد موجود لفتحه والعمل عليه.' },
+                { target: '#btnSettings', title: 'الإعدادات العامة ⚙️', text: 'هنا القلب النابض للنظام! ادخل للإعدادات لرفع صورة التوقيع الخاص بك، وخلفية الشهادة (القالب)، وضبط هوامش ومساحة الكتابة بدقة تامة لتطبق على جميع الإجازات.' }
+            ],
+            workspace: [
+                { target: '#dateGroup', title: 'تاريخ الإصدار 📅', text: 'أدخل هنا التاريخ الذي سيتم طباعته على الإجازات لهذه الدفعة. يمكنك استخدام التاريخ الهجري أو الميلادي.' },
+                { target: '#nameFormatGroup', title: 'نمط إدخال الأسماء ⚙️', text: 'حدد كيف ستقوم بإدخال الأسماء. يمكنك اختيار سطرين لكل طالب (لإدخال الاسم الكامل ثم الاسم المعرب)، أو سطر واحد فقط.' },
+                { target: '#studentsListGroup', title: 'إدخال واستخراج الأسماء ✨', text: 'ألصق أسماء الطلاب هنا. والأفضل أن تستخدم زر "استخراج ذكي" ليقوم الذكاء الاصطناعي بترتيب الأسماء المبعثرة تلقائياً في سطرين (اسم كامل ثم اسم للإعراب)!' },
+                { target: '#ijazahTextGroup', title: 'نص الإجازة 📝', text: 'اكتب ديباجة الإجازة هنا. استخدم الأزرار العلوية لوضع اسم الطالب في المكان المناسب. أو انقر على "صياغة ذكية" ليقوم الذكاء الاصطناعي بتأليف نص فصيح بالنيابة عنك.' },
+                { target: '#btnGenerateCerts', title: 'توليد الشهادات 🚀', text: 'بعد إكمال البيانات، اضغط هنا، وسيقوم النظام بتوليد الإجازات وتطبيق القالب والتوقيع عليها في لمح البصر.' },
+                { target: '#normalControls', title: 'أدوات العرض والتحميل ☑️', text: 'بعد التوليد، استخدم هذه الأزرار لترتيب الشهادات، أو التبديل بين العرض المفصل والمصغر. استخدم زر "تحديد" لتتمكن من اختيار عدة إجازات وتحميلها معاً في ملف (ZIP) مضغوط بضغطة واحدة.' },
+                { target: '#uploadBtnContainer', title: 'إرفاق الإجازات القديمة ⬆️', text: 'إذا كان لديك إجازات قديمة بصيغة PDF، يمكنك رفعها هنا لتُحفظ في نفس المجلد وتتمكن من الرجوع إليها والبحث عنها لاحقاً.' },
+                { target: '#certificatesGrid .cert-card:first-child', fallbackTarget: '#certificatesGrid', title: 'الشهادات المنجزة 📄', text: 'هنا ستظهر جميع الإجازات التي قمت بتوليدها. النظام سيعرضها لك لمعاينتها ومراجعتها.' },
+                { target: '#certificatesGrid .cert-card:first-child .badge', fallbackTarget: '#certificatesGrid', title: 'حالة الملف 🏷️', text: 'هذا الوسم يوضح حالة الشهادة، وسيتغير نصه ولونه ليؤكد لك إذا ما قمت بتحميل الشهادة كصورة أو كملف PDF أو كليهما.' },
+                { target: '#certificatesGrid .cert-card:first-child .individual-download-btns', fallbackTarget: '#certificatesGrid', title: 'أزرار التحميل 📥', text: 'من هنا يمكنك تحميل هذه الشهادة بشكل فردي. زر الـ PDF للطباعة الرسمية، وزر الصورة للمشاركة السريعة.' }
+            ]
+        };
+
+        let currentTutorialSequence = [];
+        let currentTutorialStepIndex = 0;
+
+        function startTutorial() {
+            const isWorkspace = document.getElementById('workspaceView').style.display === 'flex';
+            currentTutorialSequence = isWorkspace ? tutorialSteps.workspace : tutorialSteps.drive;
+            currentTutorialStepIndex = 0;
+
+            document.getElementById('tutorialOverlay').style.display = 'block';
+            document.getElementById('tutorialTooltip').classList.add('show');
+            document.getElementById('tutorialTooltip').style.display = 'block';
+            
+            showTutorialStep();
+        }
+
+        function showTutorialStep() {
+            document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
+
+            if (currentTutorialStepIndex >= currentTutorialSequence.length) {
+                endTutorial();
+                return;
+            }
+
+            const step = currentTutorialSequence[currentTutorialStepIndex];
+            let targetEl = document.querySelector(step.target);
+            if (!targetEl && step.fallbackTarget) {
+                targetEl = document.querySelector(step.fallbackTarget);
+            }
+
+            document.getElementById('tutorialTitle').innerText = step.title;
+            document.getElementById('tutorialContent').innerHTML = step.text;
+            
+            const nextBtn = document.getElementById('tutorialNextBtn');
+            nextBtn.innerText = currentTutorialStepIndex === currentTutorialSequence.length - 1 ? 'إنهاء الجولة' : 'التالي';
+
+            const tooltip = document.getElementById('tutorialTooltip');
+            tooltip.classList.remove('show');
+
+            if (targetEl) {
+                targetEl.classList.add('tutorial-highlight');
+                
+                const isHuge = targetEl.offsetHeight > window.innerHeight * 0.8;
+                targetEl.scrollIntoView({ behavior: 'smooth', block: isHuge ? 'start' : 'center' });
+
+                setTimeout(() => {
+                    const rect = targetEl.getBoundingClientRect();
+                    let top = rect.bottom + 20;
+                    let left = rect.left + (rect.width / 2) - 140; 
+                    
+                    tooltip.classList.remove('arrow-bottom');
+                    tooltip.style.transform = 'none'; 
+
+                    if (top + tooltip.offsetHeight > window.innerHeight - 20) {
+                        top = rect.top - tooltip.offsetHeight - 20;
+                        tooltip.classList.add('arrow-bottom');
+                    }
+                    
+                    if (top < 10 || top + tooltip.offsetHeight > window.innerHeight) {
+                        top = Math.max(20, Math.min(window.innerHeight / 2 - (tooltip.offsetHeight / 2), window.innerHeight - tooltip.offsetHeight - 20));
+                        tooltip.classList.remove('arrow-bottom');
+                    }
+                    
+                    if (left < 10) left = 10;
+                    if (left + 280 > window.innerWidth) left = window.innerWidth - 290;
+                    
+                    tooltip.style.top = top + 'px';
+                    tooltip.style.left = left + 'px';
+                    tooltip.classList.add('show');
+                }, 500); 
+            } else {
+                tooltip.style.top = '50%';
+                tooltip.style.left = '50%';
+                tooltip.style.transform = 'translate(-50%, -50%)';
+                tooltip.classList.remove('arrow-bottom');
+                tooltip.classList.add('show');
+            }
+        }
+
+        function nextTutorialStep() {
+            currentTutorialStepIndex++;
+            showTutorialStep();
+        }
+
+        function endTutorial() {
+            document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
+            document.getElementById('tutorialOverlay').style.display = 'none';
+            const tooltip = document.getElementById('tutorialTooltip');
+            tooltip.classList.remove('show');
+            setTimeout(() => { tooltip.style.display = 'none'; tooltip.style.transform = 'none'; }, 300);
+        }
+
         // ==========================================
         // منطقة إعدادات Gemini AI
         // ==========================================
@@ -680,9 +823,6 @@
             }
         }
 
-        // ==========================================
-        // وظائف البحث الشامل والترتيب الذكي
-        // ==========================================
         function sortArray(arr, sortType) {
             return arr.sort((a, b) => {
                 let nameA = (a.name || a.studentName || "").toString();
@@ -755,9 +895,6 @@
             }
         }
 
-        // ==========================================
-        // وظائف الواجهة والإعدادات
-        // ==========================================
         function showToast(message, isError = false) {
             const toast = document.getElementById("toast");
             toast.innerText = message; toast.style.backgroundColor = isError ? "var(--danger)" : "#333"; toast.className = "show";
@@ -883,20 +1020,28 @@
             executeGlobalSearchAndSort(); openFolder(newFolder.id); 
         }
 
+        // التعديل الرئيسي لمنع ظهور رسالة الخطأ updateHeaderMode null
         function updateHeaderMode(mode, folderName = "") {
-            document.getElementById('headerTitle').innerText = mode === 'drive' ? "خزانة الإجازات" : folderName;
-            document.getElementById('btnBackHeader').style.display = mode === 'drive' ? 'none' : 'flex';
-            document.getElementById('mainSearchContainer').style.display = mode === 'drive' ? 'flex' : 'none';
-            document.getElementById('btnSearchFolder').style.display = mode === 'drive' ? 'none' : 'flex';
-            document.getElementById('folderSearchContainer').style.display = 'none';
-            document.getElementById('folderSearchInput').value = '';
-            document.getElementById('driveScrollArea').style.display = mode === 'drive' ? 'block' : 'none';
-        }
-
-        function toggleFolderSearch() {
-            const container = document.getElementById('folderSearchContainer');
-            if (container.style.display === 'none' || container.style.display === '') { container.style.display = 'block'; document.getElementById('folderSearchInput').focus(); } 
-            else { container.style.display = 'none'; document.getElementById('folderSearchInput').value = ''; filterCertificates(); }
+            const headerTitle = document.getElementById('headerTitle');
+            if (headerTitle) headerTitle.innerText = mode === 'drive' ? "خزانة الإجازات" : folderName;
+            
+            const btnBackHeader = document.getElementById('btnBackHeader');
+            if (btnBackHeader) btnBackHeader.style.display = mode === 'drive' ? 'none' : 'flex';
+            
+            const mainSearchContainer = document.getElementById('mainSearchContainer');
+            if (mainSearchContainer) mainSearchContainer.style.display = mode === 'drive' ? 'flex' : 'none';
+            
+            const driveScrollArea = document.getElementById('driveScrollArea');
+            if (driveScrollArea) driveScrollArea.style.display = mode === 'drive' ? 'block' : 'none';
+            
+            const btnSearchFolder = document.getElementById('btnSearchFolder');
+            if (btnSearchFolder) btnSearchFolder.style.display = mode === 'drive' ? 'none' : 'flex';
+            
+            const folderSearchContainer = document.getElementById('folderSearchContainer');
+            if (folderSearchContainer) folderSearchContainer.style.display = 'none';
+            
+            const folderSearchInput = document.getElementById('folderSearchInput');
+            if (folderSearchInput) folderSearchInput.value = '';
         }
 
         function filterCertificates() {
