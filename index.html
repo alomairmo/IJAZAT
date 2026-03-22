@@ -13,7 +13,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700&family=Aref+Ruqaa:wght@400;700&display=swap" rel="stylesheet">
+    <!-- خط شهرزاد الجديد والخطوط الأساسية مع إضافة خط Reem Kufi -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700&family=Reem+Kufi:wght@400;700&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -22,13 +23,12 @@
             --success: #27ae60;
             --danger: #e74c3c;
             --danger-dark: #c0392b;
-            --dome-green: #007A3D; /* أخضر القبة الشريفة */
+            --dome-green: #007A3D; 
             --bg-color: #f4f7f6;
             --surface: #ffffff;
             --text-main: #333333;
             --text-muted: #7f8c8d;
             
-            /* هوامش الإجازة الديناميكية */
             --cert-pt: 31.108%; 
             --cert-pr: 10%;
             --cert-pb: 12.019%; 
@@ -37,17 +37,21 @@
 
         body { font-family: 'Tajawal', sans-serif; margin: 0; height: 100vh; background-color: var(--bg-color); overflow: hidden; color: var(--text-main); display: flex; flex-direction: column; }
 
-        /* 1. الشريط العلوي الثابت */
         .dome-header { background-color: var(--dome-green); color: white; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 20; flex-shrink: 0; }
         .header-right { display: flex; align-items: center; gap: 15px; }
         .header-right h1 { margin: 0; font-size: 1.6rem; font-weight: 700; white-space: nowrap;}
+        
+        .sync-status { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; background: rgba(0,0,0,0.2); padding: 5px 12px; border-radius: 20px; margin-right: 15px; transition: background 0.3s ease; white-space: nowrap;}
+        .sync-status.saving { background: rgba(243, 156, 18, 0.9); }
+        .sync-status.done { background: rgba(39, 174, 96, 0.9); }
+        .sync-status.error { background: rgba(231, 76, 60, 0.9); }
+
         .header-left { display: flex; align-items: center; gap: 10px; }
         .icon-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 8px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; width: 42px; height: 42px;}
         .icon-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
 
         #appContainer { display: flex; flex-grow: 1; overflow: hidden; width: 100%; }
 
-        /* 2. الخزانة (Drive View) */
         #driveView { width: 100%; display: flex; flex-direction: column; height: 100%; overflow-y: auto; scroll-behavior: smooth; }
         .search-container { background: var(--surface); padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; border-bottom: 1px solid #ddd; }
         .search-controls-wrapper { display: flex; gap: 15px; width: 100%; max-width: 800px; justify-content: center; align-items: center; flex-wrap: wrap; }
@@ -57,6 +61,11 @@
         .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #aaa; font-size: 1.2rem; pointer-events: none;}
         .sort-select { padding: 12px 15px; border-radius: 30px; border: 1px solid #ccc; font-family: inherit; outline: none; cursor: pointer; background: white; font-size: 0.95rem; font-weight: 500;}
 
+        /* أزرار التبديل بين التصنيفات */
+        .mode-toggles { display: flex; gap: 10px; background: #eee; padding: 5px; border-radius: 30px; }
+        .btn-mode { background: transparent; color: var(--text-main); border: none; padding: 8px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; font-family: inherit; transition: 0.3s; font-size: 0.9rem;}
+        .btn-mode.active { background: var(--dome-green); color: white; box-shadow: 0 2px 8px rgba(0,122,61,0.3); }
+
         .folders-container { padding: 30px; flex-grow: 1; }
         .folders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; }
         .folder-card { background: var(--surface); padding: 25px 15px; border-radius: 12px; text-align: center; cursor: pointer; transition: 0.2s; border: 1px solid #eaeaea; box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; flex-direction: column; align-items: center; position: relative;}
@@ -65,6 +74,7 @@
         .folder-card:hover .edit-folder-btn { opacity: 1; }
         .edit-folder-btn:hover { background: var(--dome-green); color: white; border-color: var(--dome-green); transform: scale(1.1); }
         .folder-icon { font-size: 4rem; margin-bottom: 15px; color: #f4d03f; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        .student-icon { color: var(--secondary); }
         .folder-title { font-weight: 700; color: var(--primary); font-size: 1.1rem; line-height: 1.4; word-break: break-word;}
         .add-folder-card { border: 2px dashed #ccc; background: transparent; justify-content: center; box-shadow: none; color: #777;}
         .add-folder-card:hover { border-color: var(--dome-green); color: var(--dome-green); background: rgba(0, 122, 61, 0.04); }
@@ -73,7 +83,7 @@
         .global-certs-section { margin-top: 40px; padding-top: 20px; border-top: 2px dashed #eaeaea; }
         .global-certs-section h3 { color: var(--primary); margin-bottom: 20px; font-size: 1.3rem;}
 
-        /* 3. مساحة العمل (Workspace View) */
+        /* Workspace View */
         #workspaceView { display: none; width: 100%; height: 100%; }
         .sidebar { width: 320px; min-width: 320px; background: var(--surface); padding: 20px; box-shadow: -2px 0 10px rgba(0,0,0,0.05); overflow-y: auto; z-index: 10; display: flex; flex-direction: column; scroll-behavior: smooth;}
         .sidebar h2 { font-size: 1.2rem; color: var(--primary); border-bottom: 2px solid var(--dome-green); padding-bottom: 10px; margin-top: 0; font-weight: 700;}
@@ -103,32 +113,77 @@
         .btn-action:active { transform: scale(0.97); }
         .btn-action.upload { background: var(--primary); }
         
-        /* Certificates Grid */
         .certificates-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 25px; padding-bottom: 30px; }
         .cert-card { background: var(--surface); border: 2px solid transparent; border-radius: 12px; position: relative; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: 0.2s; overflow: hidden; }
         .cert-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
-        .cert-card .badge { position: absolute; top: 15px; right: 15px; background: #95a5a6; color: white !important; font-size: 0.75rem; padding: 4px 10px; border-radius: 12px; z-index: 5 !important; font-weight: bold !important; transition: background 0.3s; opacity: 1 !important;}
-        .cert-card .badge.uploaded-badge { background: var(--primary) !important; }
         
-        /* أدوات التحديد */
+        /* 1. إجبار ألوان الأوسمة لتكون واضحة دائماً لكافة الشهادات القديمة والجديدة */
+        .cert-card .badge, .cert-card .badge.uploaded-badge { position: absolute; top: 15px; right: 15px; background: var(--primary) !important; color: white !important; font-size: 0.75rem; padding: 4px 10px; border-radius: 12px; z-index: 5 !important; font-weight: bold !important; transition: background 0.3s; opacity: 1 !important;}
+        .cert-card .badge.downloaded-badge { background: var(--success) !important; }
+        
         .delete-checkbox { display: none; position: absolute; top: 15px; left: 15px; width: 22px; height: 22px; z-index: 10; cursor: pointer; accent-color: var(--success); }
         .view-select-mode .delete-checkbox { display: block; }
         .view-select-mode .cert-card { cursor: pointer; border: 2px solid #eaeaea; }
         .view-select-mode .cert-card:hover { border-color: var(--success); }
-        .view-select-mode .btn-single { pointer-events: none; opacity: 0.4; } 
+        .view-select-mode .btn-single { pointer-events: none !important; opacity: 0.4 !important; } 
         .cert-card.selected-for-action { border-color: var(--success); background-color: #f2fbf5; box-shadow: 0 0 0 2px var(--success); }
 
         .cert-capture-area { padding: 15px; background: #fdfdfd; border-bottom: 1px solid #eee; overflow: hidden;}
         
-        /* Ijazah Template */
-        .ijazah-template { width: 100%; aspect-ratio: 1 / 1.414; background-color: #ffffff; padding: var(--cert-pt) var(--cert-pr) var(--cert-pb) var(--cert-pl); box-sizing: border-box; color: #1a1a1a; position: relative; overflow: hidden; display: flex; flex-direction: column; box-shadow: inset 0 0 20px rgba(0,0,0,0.02); }
+        /* === تنسيق الإجازة الحقيقي (التعديلات الجوهرية) === */
+        .ijazah-template { 
+            width: 100%; aspect-ratio: 1 / 1.414; background-color: #ffffff; 
+            padding: var(--cert-pt) var(--cert-pr) var(--cert-pb) var(--cert-pl); 
+            box-sizing: border-box; color: #1a1a1a; position: relative; overflow: hidden; 
+            display: flex; flex-direction: column; justify-content: flex-start; /* لدفع التوقيع للأعلى ليلتصق بالنص */
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.02); 
+        }
         .template-bg-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: fill; z-index: 0; pointer-events: none; }
-        .ijazah-content { position: relative; text-align: justify; text-align-last: center; line-height: 1.8; flex-grow: 1; font-family: 'Amiri', serif; font-size: 1.15em; z-index: 1; }
-        .ijazah-content strong { color: #000; font-weight: bold; font-size: 1.1em; }
+        
+        /* تطبيق خط أضواء السلف والمحاذاة التامة كالوورد */
+        .ijazah-content { 
+            position: relative; 
+            font-family: 'Adwa Assalaf', 'Scheherazade New', 'Amiri', serif !important; 
+            font-weight: 700 !important; /* بولد دائماً */
+            text-align: justify !important; 
+            text-justify: inter-word !important; /* المحاذاة التامة */
+            text-align-last: right !important; /* السطر الأخير القصير يكون لليمين كالوورد */
+            line-height: 1.8; 
+            margin-bottom: 0 !important; /* تم الإلغاء لنقل المسافة للفوتر وتوحيدها */
+            font-size: 1.25em; 
+            z-index: 1; 
+            flex-grow: 0 !important; /* إلغاء التمدد ليصعد التوقيع للأعلى */
+        }
+        
+        /* تمييز اسم الطالب والكلمات المحددة بخط مختلف وبنفس الحجم */
+        .ijazah-content strong { 
+            font-family: 'Reem Kufi', 'Amiri', serif !important; 
+            font-weight: 700 !important; 
+            color: #000; 
+            font-size: 1em !important; 
+            padding: 0 4px;
+        }
+        
         .footnote-ref { font-size: 0.7em; vertical-align: super; color: #c0392b; font-weight: bold; padding: 0 1px; }
-        .ijazah-footer { position: relative; margin-top: 1em; display: flex; justify-content: space-between; align-items: flex-start; z-index: 1; font-family: 'Amiri', serif; flex-shrink: 0; }
-        .signature-block { text-align: center; font-size: 1.15em; color: #333; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 5em; }
-        .author-info { font-weight: bold; line-height: 1.5; }
+        
+        /* تحديث الفوتر: خط أضواء السلف، عريض، حجم أكبر، ومسافة سطر واحد فقط */
+        .ijazah-footer { 
+            position: relative; display: flex; justify-content: space-between; align-items: flex-start; 
+            z-index: 1; 
+            font-family: 'Adwa Assalaf', 'Scheherazade New', 'Amiri', serif !important; 
+            font-weight: 700 !important;
+            flex-shrink: 0; 
+            margin-top: 1.8em !important; /* مقدار سطر واحد فقط (مطابق لارتفاع سطر المتن) */
+        }
+        .signature-block { 
+            text-align: center; 
+            font-size: 1.35em !important; /* أكبر قليلاً من المتن (1.25em) */
+            color: #1a1a1a; 
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; 
+            min-height: 5em; 
+        }
+        .author-info { font-weight: 700 !important; line-height: 1.5; }
+        
         .signature-img { max-width: 140px; max-height: 70px; object-fit: contain; margin-top: 0.5em; mix-blend-mode: multiply; }
         .footnotes-section { position: relative; border-top: 1px solid #777; margin-top: 1.2em; padding-top: 0.5em; font-family: 'Amiri', serif; font-size: 0.85em; text-align: right; z-index: 1; flex-shrink: 0; }
         .footnote-item { margin-bottom: 0.3em; line-height: 1.5; color: #444; }
@@ -139,11 +194,24 @@
         .cert-date { font-size: 0.85rem; color: var(--text-muted); text-align: center; }
         .individual-download-btns { display: flex; gap: 10px; justify-content: center; }
         
-        /* أزرار التحميل الجديدة بدرجات الأحمر وإصلاح الشهادات القديمة */
-        .cert-info .btn-single, .btn-download-red { background: linear-gradient(135deg, var(--danger) 0%, var(--danger-dark) 100%) !important; color: white !important; border: none !important; font-weight: bold !important; flex: 1; padding: 8px 0; text-align: center; border-radius: 6px; cursor: pointer; transition: 0.2s; font-family: inherit; opacity: 1 !important;}
-        .cert-info .btn-single:hover, .btn-download-red:hover { background: linear-gradient(135deg, var(--danger-dark) 0%, #a93226 100%) !important; transform: translateY(-1px); box-shadow: 0 4px 6px rgba(192, 57, 43, 0.3) !important;}
-        .cert-info .btn-single:active, .btn-download-red:active { transform: scale(0.97); }
-        .view-select-mode .cert-info .btn-single { pointer-events: none !important; opacity: 0.4 !important; }
+        /* 3. إجبار ألوان أزرار التحميل القديمة والجديدة للون الأحمر التام */
+        .cert-card .cert-info .individual-download-btns button { 
+            background: linear-gradient(135deg, var(--danger) 0%, var(--danger-dark) 100%) !important; 
+            color: white !important; 
+            border: none !important; 
+            font-weight: bold !important; 
+            flex: 1; padding: 8px 0; text-align: center; border-radius: 6px; cursor: pointer; transition: 0.2s; font-family: inherit; opacity: 1 !important;
+        }
+        .cert-card .cert-info .individual-download-btns button:hover { 
+            background: linear-gradient(135deg, var(--danger-dark) 0%, #a93226 100%) !important; 
+            transform: translateY(-1px); box-shadow: 0 4px 6px rgba(192, 57, 43, 0.3) !important;
+        }
+        .cert-card .cert-info .individual-download-btns button:active { transform: scale(0.97); }
+        
+        /* جعل الأزرار باهتة فقط عند تفعيل وضع التحديد */
+        .view-select-mode .cert-card .cert-info .individual-download-btns button { 
+            background: #e0e0e0 !important; color: #999 !important; pointer-events: none !important; opacity: 0.7 !important; box-shadow: none !important;
+        }
 
         .pdf-uploaded-card .cert-thumbnail { display: flex !important; height: 250px; background: #fdfdfd; border-bottom: 1px solid #eee; align-items: center; justify-content: center; flex-direction: column; color: var(--danger); }
         .pdf-uploaded-card .cert-thumbnail svg { width: 80px; height: 80px; margin-bottom: 15px; fill: currentColor; }
@@ -159,12 +227,11 @@
         .view-compact .cert-name { font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .view-compact .cert-date { font-size: 0.75rem; }
         .view-compact .individual-download-btns { gap: 5px; flex-direction: column; }
-        .view-compact .btn-download-red { padding: 6px 0; font-size: 0.75rem; }
-        .view-compact .badge { top: 8px; right: 8px; font-size: 0.65rem; padding: 2px 6px; }
+        .view-compact .individual-download-btns button { padding: 6px 0 !important; font-size: 0.75rem !important; }
+        .view-compact .badge { top: 8px !important; right: 8px !important; font-size: 0.65rem !important; padding: 2px 6px !important; }
         .view-compact .pdf-uploaded-card .cert-thumbnail { height: 140px;}
         .view-compact .pdf-uploaded-card .cert-thumbnail svg { width: 50px; height: 50px; margin-bottom: 10px; }
 
-        /* Modals */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10001; justify-content: center; align-items: center; backdrop-filter: blur(3px);}
         .modal-content { background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 550px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); font-family: 'Tajawal', sans-serif; position: relative;}
         .modal-content h3 { margin-top: 0; color: var(--dome-green); font-size: 1.4rem; border-bottom: 2px solid #eee; padding-bottom: 10px;}
@@ -183,7 +250,6 @@
         .preview-box { border: 1px dashed #ccc; padding: 10px; border-radius: 6px; margin-top: 10px; text-align: center; background: #fafafa; }
         .preview-img { max-width: 100%; max-height: 100px; object-fit: contain; }
 
-        /* Switches & Buttons */
         .insert-btns-container { display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; }
         .btn-insert { background: #ecf0f1; border: 1px solid #dcdde1; border-radius: 4px; padding: 5px 10px; font-size: 0.8rem; cursor: pointer; color: var(--primary); font-family: inherit; font-weight: bold; transition: 0.2s; }
         .btn-insert:hover { background: #d5dbdb; color: var(--dome-green); border-color: var(--dome-green);}
@@ -198,7 +264,6 @@
         .slider.round { border-radius: 20px; }
         .slider.round:before { border-radius: 50%; }
 
-        /* شاشة التحميل والرسائل */
         #loadingOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.9); color: var(--primary); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; font-size: 1.5rem; font-weight: bold; }
         .spinner { border: 5px solid #f3f3f3; border-top: 5px solid var(--dome-green); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -206,7 +271,6 @@
         #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 8px; padding: 16px 20px; position: fixed; z-index: 10000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
         #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
 
-        /* Tutorial Overlays */
         .tutorial-overlay-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10002; backdrop-filter: blur(2px); transition: 0.3s; }
         .tutorial-highlight { position: relative !important; z-index: 10003 !important; border-radius: 8px; pointer-events: none; transition: all 0.3s ease; box-shadow: 0 0 0 4px var(--dome-green), 0 0 20px rgba(0,0,0,0.3) !important; background-color: transparent !important;}
         .tutorial-tooltip { display: none; position: fixed; background: white; padding: 20px; border-radius: 12px; z-index: 10004; width: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 2px solid var(--dome-green); opacity: 0; transition: all 0.3s ease; }
@@ -237,7 +301,6 @@
 
     <div id="toast">تمت العملية بنجاح</div>
 
-    <!-- مكونات الجولة التعليمية -->
     <div id="tutorialOverlay" class="tutorial-overlay-bg"></div>
     <div id="tutorialTooltip" class="tutorial-tooltip">
         <h4 id="tutorialTitle">💡 معلومة</h4>
@@ -248,7 +311,7 @@
         </div>
     </div>
 
-    <!-- النوافذ المنبثقة -->
+    <!-- النوافذ -->
     <div id="deleteModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 350px;">
             <h3 style="color: var(--danger); border-bottom: none;">تأكيد الحذف</h3>
@@ -293,18 +356,43 @@
     <div id="newFolderModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 400px;">
             <button class="close-modal-btn" onclick="closeModal('newFolderModal')">&times;</button>
-            <h3>إنشاء ملف إجازة جديد</h3>
+            <h3>إنشاء مجلد إجازة جديد</h3>
             <div class="form-group">
                 <label>اسم الكتاب / المتن (مثال: إجازة قطر الندى)</label>
-                <input type="text" id="newFolderName" placeholder="اكتب اسم الملف هنا...">
+                <input type="text" id="newFolderName" placeholder="اكتب اسم المجلد هنا...">
             </div>
             <div class="modal-actions">
                 <button class="btn-secondary" onclick="closeModal('newFolderModal')">إلغاء</button>
-                <button class="btn-primary" onclick="createNewFolder()">إنشاء وبدء العمل</button>
+                <button class="btn-primary" onclick="createNewFolder()">إنشاء</button>
             </div>
         </div>
     </div>
     
+    <!-- نافذة إضافة إجازة مخصصة للطالب -->
+    <div id="studentIjazahModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px;">
+            <button class="close-modal-btn" onclick="closeModal('studentIjazahModal')">&times;</button>
+            <h3>➕ إضافة إجازة للطالب</h3>
+            <div class="form-group">
+                <label>اختر الإجازة (القالب):</label>
+                <select id="studentIjazahFolderSelect" onchange="checkTemplateNeedsFirstName()"></select>
+            </div>
+            <div class="form-group" id="studentFirstNameGroup" style="display: none;">
+                <label>الاسم الأول (للإعراب):</label>
+                <input type="text" id="studentIjazahFirstName" placeholder="مثال: محمداً">
+                <div class="instructions">مطلوب لأن قالب هذه الإجازة يعتمد على متغير {الاسم الاول}.</div>
+            </div>
+            <div class="form-group">
+                <label>تاريخ الإجازة:</label>
+                <input type="text" id="studentIjazahDate" value="غرة شهر رمضان المبارك ١٤٤٧هـ">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeModal('studentIjazahModal')">إلغاء</button>
+                <button class="btn-primary" onclick="generateSingleStudentIjazah()">إنشاء الإجازة</button>
+            </div>
+        </div>
+    </div>
+
     <div id="aiDraftModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 450px;">
             <button class="close-modal-btn" onclick="closeModal('aiDraftModal')">&times;</button>
@@ -395,11 +483,16 @@
         </div>
     </div>
 
-    <!-- الشريط العلوي -->
+    <!-- Header -->
     <header class="dome-header" id="mainHeader">
         <div class="header-right">
             <button class="icon-btn" id="btnBackHeader" onclick="goBackToDrive()" style="display:none;" title="العودة للخزانة">➔</button>
             <h1 id="headerTitle">خزانة الإجازات</h1>
+            
+            <div id="cloudSyncStatus" class="sync-status" title="حالة المزامنة مع السحابة">
+                <span id="syncIcon">☁️</span>
+                <span id="syncText">متصل</span>
+            </div>
         </div>
         <div class="header-left">
             <button class="icon-btn" id="btnTutorial" onclick="startTutorial()" title="شرح الواجهة">❓</button>
@@ -407,16 +500,21 @@
         </div>
     </header>
 
-    <!-- حاوية التطبيق -->
+    <!-- Main Container -->
     <div id="appContainer">
         
-        <!-- مساحة الخزانة مع البحث الشامل -->
+        <!-- Drive View -->
         <div id="driveView">
             <div class="search-container" id="mainSearchContainer">
+                <div class="mode-toggles" id="driveModeToggles">
+                    <button class="btn-mode active" id="btnModeFolders" onclick="setDriveMode('folders')">تصنيف بالمجلدات</button>
+                    <button class="btn-mode" id="btnModeStudents" onclick="setDriveMode('students')">تصنيف بالطلاب</button>
+                </div>
+
                 <div class="search-controls-wrapper">
                     <div class="search-input-wrapper">
                         <span class="search-icon">🔍</span>
-                        <input type="text" class="search-input" id="searchInput" placeholder="ابحث في أسماء المجلدات أو الشهادات..." oninput="executeGlobalSearchAndSort()">
+                        <input type="text" class="search-input" id="searchInput" placeholder="ابحث في أسماء الملفات..." oninput="executeGlobalSearchAndSort()">
                     </div>
                     <select id="globalSortSelect" class="sort-select" onchange="executeGlobalSearchAndSort()">
                         <option value="newest">الأحدث أولاً</option>
@@ -436,7 +534,6 @@
             
             <div class="folders-container" id="driveScrollArea">
                 <div class="folders-grid" id="foldersGrid"></div>
-                <!-- الحاوية الديناميكية لنتائج بحث الشهادات -->
                 <div id="globalCertsSection" class="global-certs-section" style="display: none;">
                     <h3 id="globalCertsTitle">📄 إجازات مطابقة للبحث</h3>
                     <div class="certificates-grid view-compact" id="globalCertsGrid"></div>
@@ -444,7 +541,7 @@
             </div>
         </div>
 
-        <!-- مساحة المجلد الخاص -->
+        <!-- Workspace View -->
         <div id="workspaceView">
             <div class="sidebar" id="workspaceSidebar">
                 <div id="sidebarTop">
@@ -495,7 +592,7 @@
             <div class="main-content" id="workspaceMainContent">
                 <div class="header-actions">
                     <div class="header-top-row">
-                        <h2>محتويات المجلد</h2>
+                        <h2 id="workspaceContentTitle">محتويات المجلد</h2>
                         <div class="view-sort-controls">
                             <div class="control-group" id="normalControls">
                                 <label>عرض:</label>
@@ -543,25 +640,25 @@
 
     <script>
         // ==========================================
-        // بيانات جولة الشرح التعليمية
+        // بيانات جولة الشرح التعليمية 
         // ==========================================
         const tutorialSteps = {
             drive: [
-                { target: '#mainSearchContainer', title: 'البحث الشامل 🔍', text: 'من هنا يمكنك البحث في أسماء المجلدات، وإذا فعلت خيار "البحث في الإجازات"، سيقوم النظام بالبحث عن أي طالب داخل جميع المجلدات واستخراج شهادته فوراً!' },
-                { target: '#foldersGrid', title: 'مساحة المجلدات 📁', text: 'هذه هي خزانتك الرئيسية. انقر على "ملف جديد" لإنشاء مجلد لكتاب جديد، أو انقر على أي مجلد موجود لفتحه والعمل عليه.' },
-                { target: '#btnSettings', title: 'الإعدادات العامة ⚙️', text: 'هنا القلب النابض للنظام! ادخل للإعدادات لرفع صورة التوقيع الخاص بك، وخلفية الشهادة (القالب)، وضبط هوامش ومساحة الكتابة بدقة تامة لتطبق على جميع الإجازات.' }
+                { target: '#driveModeToggles', title: 'طرق العرض والتصنيف 🗂️', text: 'بإمكانك الآن عرض الخزانة إما بتصنيف المجلدات (الإجازات) كما هو معتاد، أو بتصنيف الطلاب لرؤية جميع إجازات كل طالب في مكان واحد.' },
+                { target: '#mainSearchContainer', title: 'البحث الشامل 🔍', text: 'من هنا يمكنك البحث، وإذا فعلت خيار "البحث في الإجازات"، سيقوم النظام بالبحث عن أي طالب لاستخراج شهادته فوراً!' },
+                { target: '#foldersGrid', title: 'مساحة الملفات 📁', text: 'هذه هي خزانتك الرئيسية. انقر على الزر الأول لإنشاء ملف جديد، أو انقر على أي ملف موجود لفتحه والعمل عليه.' },
+                { target: '#btnSettings', title: 'الإعدادات العامة ⚙️', text: 'هنا القلب النابض للنظام! ادخل لرفع صورة التوقيع الخاص بك، وخلفية الشهادة (القالب)، وضبط هوامش ومساحة الكتابة لتطبق على الإجازات.' }
             ],
             workspace: [
-                { target: '#dateGroup', title: 'تاريخ الإصدار 📅', text: 'أدخل هنا التاريخ الذي سيتم طباعته على الإجازات لهذه الدفعة. يمكنك استخدام التاريخ الهجري أو الميلادي.' },
-                { target: '#nameFormatGroup', title: 'نمط إدخال الأسماء ⚙️', text: 'حدد كيف ستقوم بإدخال الأسماء. يمكنك اختيار سطرين لكل طالب (لإدخال الاسم الكامل ثم الاسم المعرب)، أو سطر واحد فقط.' },
-                { target: '#studentsListGroup', title: 'إدخال واستخراج الأسماء ✨', text: 'ألصق أسماء الطلاب هنا. والأفضل أن تستخدم زر "استخراج ذكي" ليقوم الذكاء الاصطناعي بترتيب الأسماء المبعثرة تلقائياً في سطرين (اسم كامل ثم اسم للإعراب)!' },
-                { target: '#ijazahTextGroup', title: 'نص الإجازة 📝', text: 'اكتب ديباجة الإجازة هنا. استخدم الأزرار العلوية لوضع اسم الطالب في المكان المناسب. أو انقر على "صياغة ذكية" ليقوم الذكاء الاصطناعي بتأليف نص فصيح بالنيابة عنك.' },
-                { target: '#btnGenerateCerts', title: 'توليد الشهادات 🚀', text: 'بعد إكمال البيانات، اضغط هنا، وسيقوم النظام بتوليد الإجازات وتطبيق القالب والتوقيع عليها في لمح البصر.' },
-                { target: '#normalControls', title: 'أدوات العرض والتحميل ☑️', text: 'بعد التوليد، استخدم هذه الأزرار لترتيب الشهادات، أو التبديل بين العرض المفصل والمصغر. استخدم زر "تحديد" لتتمكن من اختيار عدة إجازات وتحميلها معاً في ملف (ZIP) مضغوط بضغطة واحدة.' },
-                { target: '#uploadBtnContainer', title: 'إرفاق الإجازات القديمة ⬆️', text: 'إذا كان لديك إجازات قديمة بصيغة PDF، يمكنك رفعها هنا لتُحفظ في نفس المجلد وتتمكن من الرجوع إليها والبحث عنها لاحقاً.' },
-                { target: '#certificatesGrid .cert-card:first-child', fallbackTarget: '#certificatesGrid', title: 'الشهادات المنجزة 📄', text: 'هنا ستظهر جميع الإجازات التي قمت بتوليدها. النظام سيعرضها لك لمعاينتها ومراجعتها.' },
-                { target: '#certificatesGrid .cert-card:first-child .badge', fallbackTarget: '#certificatesGrid', title: 'حالة الملف 🏷️', text: 'هذا الوسم يوضح حالة الشهادة، وسيتغير نصه ولونه ليؤكد لك إذا ما قمت بتحميل الشهادة كصورة أو كملف PDF أو كليهما.' },
-                { target: '#certificatesGrid .cert-card:first-child .individual-download-btns', fallbackTarget: '#certificatesGrid', title: 'أزرار التحميل 📥', text: 'من هنا يمكنك تحميل هذه الشهادة بشكل فردي. زر الـ PDF للطباعة الرسمية، وزر الصورة للمشاركة السريعة.' }
+                { target: '#dateGroup', title: 'تاريخ الإصدار 📅', text: 'أدخل هنا التاريخ الذي سيتم طباعته على الإجازات لهذه الدفعة.' },
+                { target: '#nameFormatGroup', title: 'نمط إدخال الأسماء ⚙️', text: 'حدد كيف ستقوم بإدخال الأسماء (سطرين للرغبة في إعراب الاسم الأول، أو سطر واحد).' },
+                { target: '#studentsListGroup', title: 'إدخال واستخراج الأسماء ✨', text: 'ألصق أسماء الطلاب هنا. واستخدم زر "استخراج ذكي" ليقوم الذكاء الاصطناعي بترتيب الأسماء المبعثرة تلقائياً!' },
+                { target: '#ijazahTextGroup', title: 'نص الإجازة 📝', text: 'اكتب الديباجة هنا. استخدم الأزرار العلوية لوضع المتغيرات. وانقر على "صياغة ذكية" ليقوم الذكاء الاصطناعي بتأليف النص.' },
+                { target: '#btnGenerateCerts', title: 'توليد الشهادات 🚀', text: 'بعد إكمال البيانات، اضغط هنا لتوليد الإجازات وتطبيق القالب والتوقيع في لمح البصر.' },
+                { target: '#normalControls', title: 'أدوات العرض والتحميل ☑️', text: 'للتبديل بين العرض المفصل والمصغر. استخدم زر "تحديد" لتتمكن من اختيار عدة إجازات وتحميلها معاً في ملف (ZIP).' },
+                { target: '#certificatesGrid .cert-card:not(.add-folder-card)', fallbackTarget: '#certificatesGrid', title: 'الشهادات المنجزة 📄', text: 'هنا ستظهر الإجازات التي قمت بتوليدها لمعاينتها.' },
+                { target: '#certificatesGrid .cert-card:not(.add-folder-card) .badge', fallbackTarget: '#certificatesGrid', title: 'حالة الملف 🏷️', text: 'يتغير نصه ولونه ليؤكد لك إذا قمت بتحميل الشهادة أم لا.' },
+                { target: '#certificatesGrid .cert-card:not(.add-folder-card) .individual-download-btns', fallbackTarget: '#certificatesGrid', title: 'أزرار التحميل 📥', text: 'لتحميل الشهادة بشكل فردي (PDF للطباعة، وصورة للمشاركة).' }
             ]
         };
 
@@ -643,11 +740,7 @@
             }
         }
 
-        function nextTutorialStep() {
-            currentTutorialStepIndex++;
-            showTutorialStep();
-        }
-
+        function nextTutorialStep() { currentTutorialStepIndex++; showTutorialStep(); }
         function endTutorial() {
             document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
             document.getElementById('tutorialOverlay').style.display = 'none';
@@ -660,7 +753,6 @@
         // منطقة إعدادات Gemini AI
         // ==========================================
         const geminiApiKey = ""; 
-        
         async function callGeminiAPI(promptText) {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${geminiApiKey}`;
             const payload = { contents: [{ parts: [{ text: promptText }] }] };
@@ -681,25 +773,18 @@
         async function generateDraftWithAI() {
             const bookName = document.getElementById('aiBookName').value.trim();
             if(!bookName) { showToast("الرجاء إدخال اسم الكتاب", true); return; }
-            closeModal('aiDraftModal');
-            toggleLoading(true, "✨ جاري صياغة الإجازة بالذكاء الاصطناعي...");
+            closeModal('aiDraftModal'); toggleLoading(true, "✨ جاري صياغة الإجازة بالذكاء الاصطناعي...");
             try {
                 const prompt = `أنت خبير في صياغة الإجازات العلمية الإسلامية والشهادات. اكتب نص إجازة علمية رصينة ومختصرة لكتاب "${bookName}". استخدم المتغيرات {الاسم الكامل} و {الاسم الاول} للإشارة إلى الشخص المُجاز. مثال: "فقد قرأ علي الأخ الفاضل {الاسم الكامل} كتاب كذا... وأجزتُ {الاسم الاول}...". ملاحظة: لا تكتب أي مقدمات أو خاتمة لكلامك، فقط اكتب نص الإجازة مباشرة لتكون جاهزة للنسخ.`;
                 const result = await callGeminiAPI(prompt);
-                if(result) { 
-                    document.getElementById('ijazahText').value = result.trim(); 
-                    showToast("تم توليد النص بنجاح! ✨"); 
-                    saveLocalData();
-                    saveGeneralDataToFirebase();
-                } 
+                if(result) { document.getElementById('ijazahText').value = result.trim(); showToast("تم توليد النص بنجاح! ✨"); saveGeneralDataToFirebase(); } 
                 else throw new Error("Empty response");
             } catch(e) { showToast("فشل الاتصال بالذكاء الاصطناعي.", true); }
             toggleLoading(false); document.getElementById('aiBookName').value = '';
         }
 
         async function formatNamesWithAI() {
-            const listEl = document.getElementById('studentsList');
-            const rawText = listEl.value.trim();
+            const listEl = document.getElementById('studentsList'); const rawText = listEl.value.trim();
             if(!rawText) { showToast("الرجاء إدخال الأسماء أولاً ليتم ترتيبها", true); return; }
             toggleLoading(true, "✨ جاري ترتيب الأسماء بالذكاء الاصطناعي...");
             try {
@@ -712,7 +797,7 @@
         }
 
         // ==========================================
-        // إعدادات Firebase والمزامنة الحية المتقدمة (Real-time & Batch Sync)
+        // إعدادات المتغيرات العامة والـ Firebase
         // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyB3ZmFK1Sxt1X_HYtW3dL7rE7Z4rLs9YfQ",
@@ -725,26 +810,48 @@
         
         let appDbClient = null;
         let isFirstLoad = true;
+        let activePendingSyncs = 0; 
+        
+        let driveMode = 'folders'; // 'folders' | 'students'
+        let currentStudentModeName = null;
 
         let globalSettings = { dateLabel: "تاريخ الإجازة:", sheikhDetails: "وكتب\nالخادم بمدراس الحنابلة\nصالح بن محمد الأسمري", signatureBase64: "", backgroundBase64: "", marginTop: 22, marginBottom: 8.5, marginRight: 10, marginLeft: 10 };
         let folders = [{ id: "folder_1", name: "إجازة الآجرومية", templateText: "اكتب نص الإجازة هنا واستخدم المتغيرات {الاسم الكامل} و {الاسم الاول}" }];
         let currentFolderId = null;
         let sessionCertificates = [];
 
-        document.addEventListener('DOMContentLoaded', () => {
+        function updateSyncStatusUI(status) {
+            const statusEl = document.getElementById('cloudSyncStatus');
+            const icon = document.getElementById('syncIcon'); const text = document.getElementById('syncText');
+            if(!statusEl || !icon || !text) return;
+            if (status === 'saving') {
+                activePendingSyncs++; statusEl.className = 'sync-status saving'; icon.innerText = '⏳'; text.innerText = 'جاري الحفظ...';
+            } else if (status === 'done') {
+                activePendingSyncs = Math.max(0, activePendingSyncs - 1);
+                if (activePendingSyncs === 0) {
+                    statusEl.className = 'sync-status done'; icon.innerText = '✅'; text.innerText = 'تم الحفظ';
+                    setTimeout(() => { if (activePendingSyncs === 0) { statusEl.className = 'sync-status'; icon.innerText = '☁️'; text.innerText = 'متصل'; } }, 3000);
+                }
+            } else if (status === 'error') {
+                activePendingSyncs = Math.max(0, activePendingSyncs - 1); statusEl.className = 'sync-status error'; icon.innerText = '⚠️'; text.innerText = 'خطأ بالاتصال';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
             loadLocalData();
             updateUIWithSettings();
             executeGlobalSearchAndSort();
 
             try {
-                if (window.firebase) {
+                if (window.firebase && !appDbClient) {
                     firebase.initializeApp(firebaseConfig);
                     appDbClient = firebase.firestore();
-                    console.log("تم الاتصال بـ Firebase.. جاري تفعيل المزامنة الحية!");
+                    try { await appDbClient.enablePersistence({ synchronizeTabs: true }); } catch (err) {}
                     setupRealtimeListeners();
                 }
             } catch (error) {
-                console.log("العمل محلياً (لا يوجد اتصال).");
+                const cloudStatus = document.getElementById('cloudSyncStatus');
+                if(cloudStatus) { cloudStatus.className = 'sync-status error'; document.getElementById('syncIcon').innerText = '🚫'; document.getElementById('syncText').innerText = 'محلي فقط'; }
             }
         });
 
@@ -752,51 +859,37 @@
             if (!appDbClient) return;
 
             appDbClient.collection('ijazah_data').doc('settings').onSnapshot(doc => {
-                if (doc.exists) {
+                if (doc.exists && !doc.metadata.hasPendingWrites) { 
                     const data = doc.data();
-                    globalSettings.dateLabel = data.dateLabel || "تاريخ الإجازة:";
-                    globalSettings.sheikhDetails = data.sheikhDetails || "";
-                    globalSettings.marginTop = data.marginTop !== undefined ? data.marginTop : 22;
-                    globalSettings.marginBottom = data.marginBottom !== undefined ? data.marginBottom : 8.5;
-                    globalSettings.marginRight = data.marginRight !== undefined ? data.marginRight : 10;
-                    globalSettings.marginLeft = data.marginLeft !== undefined ? data.marginLeft : 10;
-                    if(!isFirstLoad) { updateUIWithSettings(); }
+                    globalSettings.dateLabel = data.dateLabel || "تاريخ الإجازة:"; globalSettings.sheikhDetails = data.sheikhDetails || "";
+                    globalSettings.marginTop = data.marginTop !== undefined ? data.marginTop : 22; globalSettings.marginBottom = data.marginBottom !== undefined ? data.marginBottom : 8.5;
+                    globalSettings.marginRight = data.marginRight !== undefined ? data.marginRight : 10; globalSettings.marginLeft = data.marginLeft !== undefined ? data.marginLeft : 10;
+                    if(!isFirstLoad) { updateUIWithSettings(); saveLocalData(); }
                 }
             });
 
             appDbClient.collection('ijazah_data').doc('images').onSnapshot(doc => {
-                if (doc.exists) {
-                    globalSettings.signatureBase64 = doc.data().signature || "";
-                    globalSettings.backgroundBase64 = doc.data().background || "";
-                    if(!isFirstLoad) updateUIWithSettings();
+                if (doc.exists && !doc.metadata.hasPendingWrites) {
+                    globalSettings.signatureBase64 = doc.data().signature || ""; globalSettings.backgroundBase64 = doc.data().background || "";
+                    if(!isFirstLoad) { updateUIWithSettings(); saveLocalData(); }
                 }
             });
 
             appDbClient.collection('ijazah_data').doc('folders').onSnapshot(doc => {
-                if (doc.exists && doc.data().list) {
-                    folders = doc.data().list;
-                    saveLocalData();
-                    if(!isFirstLoad && document.getElementById('driveView').style.display !== 'none') {
-                        executeGlobalSearchAndSort();
-                    }
+                if (doc.exists && doc.data().list && !doc.metadata.hasPendingWrites) {
+                    folders = doc.data().list; saveLocalData();
+                    if(!isFirstLoad && document.getElementById('driveView').style.display !== 'none') executeGlobalSearchAndSort();
                 }
             });
 
             appDbClient.collection('ijazah_data').doc('certs').collection('items').onSnapshot(snapshot => {
-                let loadedCerts = [];
-                snapshot.forEach(doc => { loadedCerts.push(doc.data()); });
+                if (snapshot.metadata.hasPendingWrites) return;
+                let loadedCerts = []; snapshot.forEach(doc => { loadedCerts.push(doc.data()); });
                 
                 if (isFirstLoad && snapshot.empty && sessionCertificates.length > 0) {
-                    // إذا كانت السحابة فارغة تماماً والذاكرة المحلية فيها بيانات، نرفع كل شيء
-                    saveLocalData();
-                    saveGeneralDataToFirebase();
-                    saveCertsToFirebase(sessionCertificates);
-                } else {
-                    sessionCertificates = loadedCerts;
-                    saveLocalData();
-                }
-                
-                if(!isFirstLoad) {
+                    saveGeneralDataToFirebase(); saveCertsToFirebase(sessionCertificates);
+                } else if (!isFirstLoad) {
+                    sessionCertificates = loadedCerts; saveLocalData();
                     if(document.getElementById('workspaceView').style.display !== 'none') renderWorkspaceCerts();
                     else executeGlobalSearchAndSort();
                 }
@@ -810,7 +903,7 @@
                 const s = localStorage.getItem('ijazah_settings'); if (s) globalSettings = JSON.parse(s);
                 const f = localStorage.getItem('ijazah_folders'); if (f) folders = JSON.parse(f);
                 const c = localStorage.getItem('ijazah_certificates'); if (c) sessionCertificates = JSON.parse(c);
-            } catch(e) { console.error(e); }
+            } catch(e) {}
         }
 
         function saveLocalData() {
@@ -821,78 +914,59 @@
             } catch(e) { console.warn("مساحة التخزين المحلي ممتلئة."); }
         }
 
-        // --- دوال الحفظ الذكية المنفصلة (Delta Sync) ---
         async function saveGeneralDataToFirebase() {
+            saveLocalData();
             if (!appDbClient) return;
+            updateSyncStatusUI('saving');
             try {
                 await Promise.all([
-                    appDbClient.collection('ijazah_data').doc('settings').set({ 
-                        dateLabel: globalSettings.dateLabel, sheikhDetails: globalSettings.sheikhDetails, 
-                        marginTop: globalSettings.marginTop, marginBottom: globalSettings.marginBottom, 
-                        marginRight: globalSettings.marginRight, marginLeft: globalSettings.marginLeft 
-                    }),
-                    appDbClient.collection('ijazah_data').doc('images').set({ 
-                        signature: globalSettings.signatureBase64, background: globalSettings.backgroundBase64 
-                    }),
+                    appDbClient.collection('ijazah_data').doc('settings').set({ dateLabel: globalSettings.dateLabel, sheikhDetails: globalSettings.sheikhDetails, marginTop: globalSettings.marginTop, marginBottom: globalSettings.marginBottom, marginRight: globalSettings.marginRight, marginLeft: globalSettings.marginLeft }),
+                    appDbClient.collection('ijazah_data').doc('images').set({ signature: globalSettings.signatureBase64, background: globalSettings.backgroundBase64 }),
                     appDbClient.collection('ijazah_data').doc('folders').set({ list: folders })
                 ]);
-            } catch(e) { console.error("Error saving general data:", e); }
+                updateSyncStatusUI('done');
+            } catch(e) { updateSyncStatusUI('error'); }
         }
 
         async function saveCertsToFirebase(certsArray) {
+            saveLocalData();
             if (!appDbClient || !certsArray || certsArray.length === 0) return;
+            updateSyncStatusUI('saving');
             try {
-                let batches = [];
-                let currentBatch = appDbClient.batch();
-                let opCount = 0;
-
+                let batches = [], currentBatch = appDbClient.batch(), opCount = 0;
                 certsArray.forEach(cert => {
                     let docRef = appDbClient.collection('ijazah_data').doc('certs').collection('items').doc(cert.id);
-                    currentBatch.set(docRef, cert);
-                    opCount++;
-                    
-                    if (opCount === 400) {
-                        batches.push(currentBatch);
-                        currentBatch = appDbClient.batch();
-                        opCount = 0;
-                    }
+                    currentBatch.set(docRef, cert); opCount++;
+                    if (opCount === 400) { batches.push(currentBatch); currentBatch = appDbClient.batch(); opCount = 0; }
                 });
-                
                 if (opCount > 0) batches.push(currentBatch);
-                
-                for (let batch of batches) {
-                    await batch.commit();
-                    await new Promise(r => setTimeout(r, 200)); // استراحة للسيرفر لمنع الاختناق
-                }
-            } catch(e) { console.error("Error saving certs to Firebase:", e); }
+                for (let batch of batches) { await batch.commit(); await new Promise(r => setTimeout(r, 200)); }
+                updateSyncStatusUI('done');
+            } catch(e) { updateSyncStatusUI('error'); }
         }
 
         async function deleteCertsFromFirebase(certIdsArray) {
+            saveLocalData();
             if (!appDbClient || !certIdsArray || certIdsArray.length === 0) return;
+            updateSyncStatusUI('saving');
             try {
-                let batches = [];
-                let currentBatch = appDbClient.batch();
-                let opCount = 0;
-                
+                let batches = [], currentBatch = appDbClient.batch(), opCount = 0;
                 certIdsArray.forEach(id => {
                     let docRef = appDbClient.collection('ijazah_data').doc('certs').collection('items').doc(id);
-                    currentBatch.delete(docRef);
-                    opCount++;
-                    
-                    if (opCount === 400) {
-                        batches.push(currentBatch);
-                        currentBatch = appDbClient.batch();
-                        opCount = 0;
-                    }
+                    currentBatch.delete(docRef); opCount++;
+                    if (opCount === 400) { batches.push(currentBatch); currentBatch = appDbClient.batch(); opCount = 0; }
                 });
-                
                 if (opCount > 0) batches.push(currentBatch);
-                
-                for (let batch of batches) {
-                    await batch.commit();
-                    await new Promise(r => setTimeout(r, 200)); // استراحة للسيرفر
-                }
-            } catch(e) { console.error("Error deleting certs from Firebase:", e); }
+                for (let batch of batches) { await batch.commit(); await new Promise(r => setTimeout(r, 200)); }
+                updateSyncStatusUI('done');
+            } catch(e) { updateSyncStatusUI('error'); }
+        }
+
+        function setDriveMode(mode) {
+            driveMode = mode;
+            document.getElementById('btnModeFolders').className = mode === 'folders' ? 'btn-mode active' : 'btn-mode';
+            document.getElementById('btnModeStudents').className = mode === 'students' ? 'btn-mode active' : 'btn-mode';
+            executeGlobalSearchAndSort();
         }
 
         function sortArray(arr, sortType) {
@@ -914,47 +988,61 @@
             const searchInCerts = document.getElementById('searchInCertsToggle').checked;
             const sortType = document.getElementById('globalSortSelect').value;
             
-            let filteredFolders = folders.filter(f => f.name.toLowerCase().includes(q));
-            filteredFolders = sortArray(filteredFolders, sortType);
-            
-            let filteredCerts = [];
-            if (searchInCerts && q !== "") {
-                filteredCerts = sessionCertificates.filter(c => c.studentName.toLowerCase().includes(q));
-                filteredCerts = sortArray(filteredCerts, sortType);
-            }
-
-            renderDriveView(filteredFolders, filteredCerts);
-        }
-
-        function renderDriveView(fList, cList) {
             const grid = document.getElementById('foldersGrid');
-            grid.innerHTML = `<div class="folder-card add-folder-card" onclick="openModal('newFolderModal')"><div class="add-icon">+</div><div class="folder-title">ملف جديد</div></div>`;
-            
-            fList.forEach(folder => {
-                const card = document.createElement('div'); card.className = 'folder-card'; card.onclick = () => openFolder(folder.id);
-                card.innerHTML = `<button class="edit-folder-btn" onclick="renameFolder(event, '${folder.id}')" title="تغيير اسم الملف">✏️</button><div class="folder-icon">📁</div><div class="folder-title">${folder.name}</div>`;
-                grid.appendChild(card);
-            });
+            grid.innerHTML = '';
 
+            if (driveMode === 'folders') {
+                let filteredFolders = folders.filter(f => f.name.toLowerCase().includes(q));
+                filteredFolders = sortArray(filteredFolders, sortType);
+                
+                grid.innerHTML = `<div class="folder-card add-folder-card" onclick="openModal('newFolderModal')"><div class="add-icon">+</div><div class="folder-title">مجلد جديد</div></div>`;
+                filteredFolders.forEach(folder => {
+                    const card = document.createElement('div'); card.className = 'folder-card'; card.onclick = () => openFolder(folder.id);
+                    card.innerHTML = `<button class="edit-folder-btn" onclick="renameFolder(event, '${folder.id}')" title="تغيير اسم الملف">✏️</button><div class="folder-icon">📁</div><div class="folder-title">${folder.name}</div>`;
+                    grid.appendChild(card);
+                });
+            } else if (driveMode === 'students') {
+                let uniqueStudents = [...new Set(sessionCertificates.map(c => c.studentName))].filter(name => name && name.trim() !== "");
+                let filteredStudents = uniqueStudents.filter(s => s.toLowerCase().includes(q));
+                
+                if (sortType === 'name_asc' || sortType === 'name_desc') {
+                    filteredStudents.sort((a,b) => sortType === 'name_asc' ? a.localeCompare(b, 'ar') : b.localeCompare(a, 'ar'));
+                } else {
+                    filteredStudents.sort((a,b) => {
+                        let tA = Math.max(...sessionCertificates.filter(c=>c.studentName===a).map(c=>c.timestamp||0));
+                        let tB = Math.max(...sessionCertificates.filter(c=>c.studentName===b).map(c=>c.timestamp||0));
+                        return sortType === 'newest' ? tB - tA : tA - tB;
+                    });
+                }
+
+                filteredStudents.forEach(student => {
+                    const card = document.createElement('div'); card.className = 'folder-card'; card.onclick = () => openStudentFolder(student);
+                    card.innerHTML = `<div class="folder-icon student-icon">👤</div><div class="folder-title">${student}</div>`;
+                    grid.appendChild(card);
+                });
+            }
+            
             const certsSection = document.getElementById('globalCertsSection');
             const cGrid = document.getElementById('globalCertsGrid');
             cGrid.innerHTML = '';
 
-            if (cList.length > 0) {
+            let filteredCerts = [];
+            if (searchInCerts && q !== "") {
+                filteredCerts = sessionCertificates.filter(c => c.studentName.toLowerCase().includes(q) || (folders.find(f=>f.id===c.folderId)?.name||'').toLowerCase().includes(q));
+                filteredCerts = sortArray(filteredCerts, sortType);
+            }
+
+            if (filteredCerts.length > 0) {
                 certsSection.style.display = 'block';
-                document.getElementById('globalCertsTitle').innerText = `📄 إجازات مطابقة للبحث (${cList.length})`;
+                document.getElementById('globalCertsTitle').innerText = `📄 إجازات مطابقة للبحث (${filteredCerts.length})`;
                 
-                cList.forEach(cert => {
-                    const card = document.createElement('div');
-                    card.className = cert.isUploadedPdf ? 'cert-card pdf-uploaded-card' : 'cert-card';
-                    card.id = 'global_' + cert.id;
-                    
-                    let html = cert.cardInnerHTML.replace(/<input type="checkbox" class="delete-checkbox".*?>/, '');
-                    card.innerHTML = html;
+                filteredCerts.forEach(cert => {
+                    const card = document.createElement('div'); card.className = cert.isUploadedPdf ? 'cert-card pdf-uploaded-card' : 'cert-card'; card.id = 'global_' + cert.id;
+                    card.innerHTML = cert.cardInnerHTML.replace(/<input type="checkbox" class="delete-checkbox".*?>/, '');
                     
                     const badge = card.querySelector('.badge');
                     if (badge && cert.downloadedStatus && cert.downloadedStatus.length > 0) {
-                        badge.style.background = "var(--success)";
+                        badge.classList.add('downloaded-badge');
                         if (cert.downloadedStatus.includes('pdf') && cert.downloadedStatus.includes('png')) badge.innerText = "تم التحميل";
                         else if (cert.downloadedStatus.includes('pdf')) badge.innerText = "تم التحميل كـ PDF";
                         else badge.innerText = "تم التحميل كصورة";
@@ -965,6 +1053,94 @@
             } else {
                 certsSection.style.display = 'none';
             }
+        }
+
+        function openFolder(id) {
+            const folder = folders.find(f => f.id === id); if(!folder) return;
+            currentFolderId = folder.id; 
+            currentStudentModeName = null;
+            updateHeaderMode('workspace', folder.name);
+            document.getElementById('ijazahText').value = folder.templateText; 
+            document.getElementById('studentsList').value = '';
+            
+            document.getElementById('driveView').style.display = 'none'; 
+            document.getElementById('workspaceView').style.display = 'flex';
+            document.getElementById('workspaceSidebar').style.display = 'flex';
+            
+            cancelSelectMode(); renderWorkspaceCerts();
+        }
+
+        function openStudentFolder(studentName) {
+            currentFolderId = null;
+            currentStudentModeName = studentName;
+            updateHeaderMode('workspace', 'ملف الطالب: ' + studentName);
+            
+            document.getElementById('driveView').style.display = 'none'; 
+            document.getElementById('workspaceView').style.display = 'flex';
+            document.getElementById('workspaceSidebar').style.display = 'none'; 
+            
+            cancelSelectMode(); renderWorkspaceCerts();
+        }
+
+        function openNewStudentCertModal() {
+            const select = document.getElementById('studentIjazahFolderSelect');
+            select.innerHTML = folders.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
+            document.getElementById('studentIjazahFirstName').value = currentStudentModeName.split(' ')[0];
+            checkTemplateNeedsFirstName();
+            openModal('studentIjazahModal');
+        }
+
+        function checkTemplateNeedsFirstName() {
+            const folderId = document.getElementById('studentIjazahFolderSelect').value;
+            const folder = folders.find(f => f.id === folderId);
+            if(folder && folder.templateText.includes('{الاسم الاول}')) {
+                document.getElementById('studentFirstNameGroup').style.display = 'block';
+            } else {
+                document.getElementById('studentFirstNameGroup').style.display = 'none';
+            }
+        }
+
+        function generateSingleStudentIjazah() {
+            const folderId = document.getElementById('studentIjazahFolderSelect').value;
+            const firstName = document.getElementById('studentIjazahFirstName').value.trim();
+            const issueDateString = document.getElementById('studentIjazahDate').value.trim();
+            const fullName = currentStudentModeName;
+
+            const folder = folders.find(f => f.id === folderId);
+            if(!folder || !fullName) return;
+
+            let textTemplate = folder.templateText;
+            const bgImgHtml = `<img src="" data-type="background" class="template-bg-img dynamic-img" alt="خلفية الإجازة" style="display: none;">`;
+            const signatureHtml = `<img src="" data-type="signature" class="signature-img dynamic-img" alt="التوقيع" style="display: none;"><div class="sig-placeholder" style="display: none;"><br>......................</div>`;
+            const sheikhDetailsHtml = globalSettings.sheikhDetails.replace(/\n/g, '<br>');
+            const dateLabelText = globalSettings.dateLabel || "تاريخ الإجازة:";
+
+            const pt = (globalSettings.marginTop !== undefined ? globalSettings.marginTop : 22) * 1.414;
+            const pb = (globalSettings.marginBottom !== undefined ? globalSettings.marginBottom : 8.5) * 1.414;
+            const pr = globalSettings.marginRight !== undefined ? globalSettings.marginRight : 10;
+            const pl = globalSettings.marginLeft !== undefined ? globalSettings.marginLeft : 10;
+
+            let footnotes = []; let textWithFootnoteRefs = textTemplate; let footnotesHtml = '';
+            textWithFootnoteRefs = textTemplate.replace(/\[(.*?)\]/g, (m, txt) => { footnotes.push(txt); return `<sup class="footnote-ref">(${footnotes.length})</sup>`; });
+            footnotesHtml = footnotes.length > 0 ? `<div class="footnotes-section">${footnotes.map((fn, i) => `<div class="footnote-item"><span class="footnote-num">(${i+1})</span> ${fn}</div>`).join('')}</div>` : '';
+            
+            let finalIjazahHtml = textWithFootnoteRefs.replace(/\n/g, '<br>')
+                                    .replace(/\*(.*?)\*/g, '<strong>$1</strong>')
+                                    .replace(/{الاسم الكامل}/g, `<strong>${fullName}</strong>`)
+                                    .replace(/{الاسم الاول}/g, `<strong>${firstName || fullName.split(' ')[0]}</strong>`);
+            
+            let certId = 'cert_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+            
+            let innerHTML = `<input type="checkbox" class="delete-checkbox" value="${certId}"><span class="badge" id="badge_${certId}">جديد</span><div class="cert-thumbnail"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg><span class="cert-thumbnail-label">وثيقة الإجازة</span></div><div class="cert-capture-area"><div class="ijazah-template needs-adjustment" style="padding: ${pt}% ${pr}% ${pb}% ${pl}%;">${bgImgHtml} <div class="ijazah-content">${finalIjazahHtml}</div><div class="ijazah-footer"><div class="signature-block"><div style="visibility: hidden; line-height: 1.5; font-weight: bold;">${sheikhDetailsHtml.split('<br>')[0] || 'وكتب'}</div><div style="font-weight:bold; line-height: 1.5;">${dateLabelText}</div><div style="line-height: 1.5;">${issueDateString}</div></div><div class="signature-block"><div class="author-info">${sheikhDetailsHtml}</div>${signatureHtml}</div></div>${footnotesHtml}</div></div><div class="cert-info"><div class="cert-name" title="${fullName}">${fullName}</div><div class="cert-date">${issueDateString}</div><div class="individual-download-btns"><button class="btn-action btn-single btn-download-red" onclick="downloadSingle('${certId}', 'pdf')">PDF</button><button class="btn-action btn-single btn-download-red" onclick="downloadSingle('${certId}', 'png')">صورة</button></div></div>`;
+            
+            let certObj = { id: certId, folderId: folderId, studentName: fullName, timestamp: Date.now(), isUploadedPdf: false, cardInnerHTML: innerHTML, downloadedStatus: [] };
+            
+            sessionCertificates.push(certObj);
+            
+            closeModal('studentIjazahModal');
+            renderWorkspaceCerts(); 
+            showToast("تم إضافة الإجازة للطالب بنجاح!"); 
+            saveCertsToFirebase([certObj]);
         }
 
         function showToast(message, isError = false) {
@@ -1068,7 +1244,6 @@
             globalSettings.marginLeft = parseFloat(document.getElementById('margLeft').value);
             applyMarginsToRoot();
             
-            saveLocalData();
             saveGeneralDataToFirebase();
             
             closeModal('settingsModal'); 
@@ -1087,11 +1262,10 @@
             const folder = folders.find(f => f.id === id);
             if (folder) { 
                 folder.name = newName; 
-                saveLocalData();
                 saveGeneralDataToFirebase();
                 executeGlobalSearchAndSort(); 
                 showToast("تم تغيير اسم الملف"); 
-                if (currentFolderId === id) document.getElementById('headerTitle').innerText = folder.name; 
+                if (currentFolderId === id) document.getElementById('workspaceContentTitle').innerText = folder.name; 
             }
             closeModal('renameFolderModal');
         }
@@ -1101,17 +1275,18 @@
             if (!name) return showToast("الرجاء كتابة اسم الملف", true);
             const newFolder = { id: "folder_" + Date.now(), name: name, templateText: "اكتب نص الإجازة هنا...\nاستخدم {الاسم الكامل} و {الاسم الاول} في أماكنها." };
             folders.push(newFolder); 
-            saveLocalData();
             saveGeneralDataToFirebase(); 
             closeModal('newFolderModal'); 
             document.getElementById('newFolderName').value = '';
             executeGlobalSearchAndSort(); openFolder(newFolder.id); 
         }
 
-        function updateHeaderMode(mode, folderName = "") {
+        function updateHeaderMode(mode, titleName = "") {
             const headerTitle = document.getElementById('headerTitle');
-            if (headerTitle) headerTitle.innerText = mode === 'drive' ? "خزانة الإجازات" : folderName;
+            if (headerTitle) headerTitle.innerText = mode === 'drive' ? "خزانة الإجازات" : titleName;
             
+            document.getElementById('workspaceContentTitle').innerText = titleName;
+
             const btnBackHeader = document.getElementById('btnBackHeader');
             if (btnBackHeader) btnBackHeader.style.display = mode === 'drive' ? 'none' : 'flex';
             
@@ -1131,30 +1306,16 @@
             if (folderSearchInput) folderSearchInput.value = '';
         }
 
-        function filterCertificates() {
-            const q = document.getElementById('folderSearchInput').value.toLowerCase();
-            document.querySelectorAll('#certificatesGrid .cert-card').forEach(card => { card.style.display = card.dataset.name.toLowerCase().includes(q) ? 'flex' : 'none'; });
-        }
-
-        function openFolder(id) {
-            const folder = folders.find(f => f.id === id); if(!folder) return;
-            currentFolderId = folder.id; updateHeaderMode('folder', folder.name);
-            document.getElementById('ijazahText').value = folder.templateText; document.getElementById('studentsList').value = '';
-            document.getElementById('driveView').style.display = 'none'; document.getElementById('workspaceView').style.display = 'flex';
-            cancelSelectMode(); renderWorkspaceCerts();
-        }
-
         function goBackToDrive() {
             if(currentFolderId) { 
                 const folder = folders.find(f => f.id === currentFolderId); 
                 if(folder) { 
                     folder.templateText = document.getElementById('ijazahText').value; 
-                    saveLocalData();
                     saveGeneralDataToFirebase();
                 } 
             }
             updateHeaderMode('drive'); document.getElementById('workspaceView').style.display = 'none'; document.getElementById('driveView').style.display = 'flex';
-            currentFolderId = null; executeGlobalSearchAndSort(); 
+            currentFolderId = null; currentStudentModeName = null; executeGlobalSearchAndSort(); 
         }
 
         function insertAtCursor(elementId, text, isBracket = false) {
@@ -1184,8 +1345,24 @@
             const grid = document.getElementById('certificatesGrid');
             grid.innerHTML = '';
             
-            let folderCerts = sessionCertificates.filter(c => c.folderId === currentFolderId);
-            if(folderCerts.length === 0) {
+            let folderCerts = [];
+            if (currentFolderId) {
+                folderCerts = sessionCertificates.filter(c => c.folderId === currentFolderId);
+            } else if (currentStudentModeName) {
+                folderCerts = sessionCertificates.filter(c => c.studentName === currentStudentModeName);
+                
+                const addCard = document.createElement('div');
+                addCard.className = 'cert-card add-folder-card';
+                addCard.style.minHeight = '280px';
+                addCard.style.display = 'flex';
+                addCard.style.justifyContent = 'center';
+                addCard.style.cursor = 'pointer';
+                addCard.onclick = () => openNewStudentCertModal();
+                addCard.innerHTML = `<div class="add-icon">+</div><div class="folder-title">إضافة إجازة للطالب</div>`;
+                grid.appendChild(addCard);
+            }
+
+            if(folderCerts.length === 0 && !currentStudentModeName) {
                 grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: #999; padding: 40px; border: 2px dashed #ccc; border-radius: 10px;">لم يتم إنشاء أو إرفاق أي إجازات في هذا الملف بعد.</div>`;
                 return;
             }
@@ -1195,7 +1372,16 @@
 
             folderCerts.forEach(cert => {
                 const card = document.createElement('div'); card.className = cert.isUploadedPdf ? 'cert-card pdf-uploaded-card' : 'cert-card';
-                card.id = cert.id; card.innerHTML = cert.cardInnerHTML;
+                card.id = cert.id; 
+                
+                let html = cert.cardInnerHTML;
+                if (currentStudentModeName) {
+                    const fName = folders.find(f => f.id === cert.folderId)?.name || 'إجازة';
+                    if (!html.includes('cert-folder-label')) {
+                        html = html.replace('<div class="cert-name"', `<div class="cert-folder-label" style="font-size:0.8rem; color:var(--dome-green); font-weight:bold; margin-bottom: -5px;">${fName}</div><div class="cert-name"`);
+                    }
+                }
+                card.innerHTML = html;
 
                 const cb = card.querySelector('.delete-checkbox');
                 cb.addEventListener('change', function() { 
@@ -1207,7 +1393,7 @@
                 
                 const badge = card.querySelector('.badge');
                 if (badge && cert.downloadedStatus && cert.downloadedStatus.length > 0) {
-                    badge.style.background = "var(--success)";
+                    badge.classList.add('downloaded-badge');
                     if (cert.downloadedStatus.includes('pdf') && cert.downloadedStatus.includes('png')) badge.innerText = "تم التحميل";
                     else if (cert.downloadedStatus.includes('pdf')) badge.innerText = "تم التحميل كـ PDF";
                     else badge.innerText = "تم التحميل كصورة";
@@ -1251,7 +1437,10 @@
         });
 
         function toggleSelectMode() {
-            const folderCerts = sessionCertificates.filter(c => c.folderId === currentFolderId);
+            let folderCerts = [];
+            if (currentFolderId) folderCerts = sessionCertificates.filter(c => c.folderId === currentFolderId);
+            else if (currentStudentModeName) folderCerts = sessionCertificates.filter(c => c.studentName === currentStudentModeName);
+
             if (folderCerts.length === 0) return showToast("لا توجد إجازات لتحديدها.", true);
             document.getElementById('certificatesGrid').classList.add('view-select-mode'); document.getElementById('normalControls').style.display = 'none'; document.getElementById('sortControlGroup').style.display = 'none'; document.getElementById('headerBottomRow').style.display = 'none'; document.getElementById('selectionControls').style.display = 'flex'; document.getElementById('selectAllCheckbox').checked = false; document.querySelectorAll('.delete-checkbox').forEach(cb => { cb.checked = false; cb.dispatchEvent(new Event('change')); }); showToast("اختر الإجازات ثم حدد الإجراء من الأعلى");
         }
@@ -1271,7 +1460,6 @@
             
             cancelSelectMode(); 
             renderWorkspaceCerts(); 
-            saveLocalData(); 
             deleteCertsFromFirebase(selectedIds);
             showToast("تم الحذف بنجاح.");
         }
@@ -1298,27 +1486,16 @@
             closeModal('moveModal'); 
             cancelSelectMode(); 
             renderWorkspaceCerts(); 
-            saveLocalData();
             saveCertsToFirebase(movedCerts);
             showToast("تم نقل الملفات بنجاح!");
         }
 
         function handleOldPdfUpload(event) {
             const files = event.target.files; if (!files || files.length === 0) return;
-            
-            let processedCount = 0;
             let newlyUploadedCerts = [];
             
             Array.from(files).forEach(file => {
-                if (file.type !== "application/pdf") {
-                    showToast("الرجاء رفع ملف PDF فقط", true);
-                    processedCount++;
-                    if(processedCount === files.length) {
-                        saveLocalData();
-                        saveCertsToFirebase(newlyUploadedCerts);
-                    }
-                    return;
-                }
+                if (file.type !== "application/pdf") { showToast("الرجاء رفع ملف PDF فقط", true); return; }
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const certId = 'cert_' + Date.now() + '_' + Math.floor(Math.random()*1000);
@@ -1327,13 +1504,9 @@
                     let newCert = { id: certId, folderId: currentFolderId, studentName: name, timestamp: Date.now(), isUploadedPdf: true, pdfDataUrl: e.target.result, cardInnerHTML: innerHTML, downloadedStatus: [] };
                     sessionCertificates.push(newCert);
                     newlyUploadedCerts.push(newCert);
-                    renderWorkspaceCerts(); showToast("تم إرفاق الملف بنجاح!"); 
                     
-                    processedCount++;
-                    if(processedCount === files.length) {
-                        saveLocalData();
-                        saveCertsToFirebase(newlyUploadedCerts);
-                    }
+                    renderWorkspaceCerts(); showToast("تم إرفاق الملف بنجاح!"); 
+                    saveCertsToFirebase([newCert]); 
                 }; reader.readAsDataURL(file);
             }); event.target.value = '';
         }
@@ -1347,7 +1520,7 @@
             const enableFootnotes = document.getElementById('enableFootnotesToggle').checked;
 
             if(lines.length === 0) return showToast("رجاءً أدخل أسماء الطلاب أولاً.", true); 
-            if(currentFolderId) { const folder = folders.find(f => f.id === currentFolderId); if(folder) { folder.templateText = textTemplate; } }
+            if(currentFolderId) { const folder = folders.find(f => f.id === currentFolderId); if(folder) { folder.templateText = textTemplate; saveGeneralDataToFirebase();} }
 
             const bgImgHtml = `<img src="" data-type="background" class="template-bg-img dynamic-img" alt="خلفية الإجازة" style="display: none;">`;
             const signatureHtml = `<img src="" data-type="signature" class="signature-img dynamic-img" alt="التوقيع" style="display: none;"><div class="sig-placeholder" style="display: none;"><br>......................</div>`;
@@ -1372,7 +1545,10 @@
                     footnotesHtml = footnotes.length > 0 ? `<div class="footnotes-section">${footnotes.map((fn, i) => `<div class="footnote-item"><span class="footnote-num">(${i+1})</span> ${fn}</div>`).join('')}</div>` : '';
                 }
 
-                let finalIjazahHtml = textWithFootnoteRefs.replace(/\n/g, '<br>').replace(/{الاسم الكامل}/g, `<strong>${full}</strong>`).replace(/{الاسم الاول}/g, `<strong>${first}</strong>`);
+                let finalIjazahHtml = textWithFootnoteRefs.replace(/\n/g, '<br>')
+                                        .replace(/\*(.*?)\*/g, '<strong>$1</strong>')
+                                        .replace(/{الاسم الكامل}/g, `<strong>${full}</strong>`)
+                                        .replace(/{الاسم الاول}/g, `<strong>${first}</strong>`);
                 let certId = 'cert_' + Date.now() + '_' + processIndex;
                 let innerHTML = `<input type="checkbox" class="delete-checkbox" value="${certId}"><span class="badge" id="badge_${certId}">جديد</span><div class="cert-thumbnail"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg><span class="cert-thumbnail-label">وثيقة الإجازة</span></div><div class="cert-capture-area"><div class="ijazah-template needs-adjustment" style="padding: ${pt}% ${pr}% ${pb}% ${pl}%;">${bgImgHtml} <div class="ijazah-content">${finalIjazahHtml}</div><div class="ijazah-footer"><div class="signature-block"><div style="visibility: hidden; line-height: 1.5; font-weight: bold;">${sheikhDetailsHtml.split('<br>')[0] || 'وكتب'}</div><div style="font-weight:bold; line-height: 1.5;">${dateLabelText}</div><div style="line-height: 1.5;">${date}</div></div><div class="signature-block"><div class="author-info">${sheikhDetailsHtml}</div>${signatureHtml}</div></div>${footnotesHtml}</div></div><div class="cert-info"><div class="cert-name" title="${full}">${full}</div><div class="cert-date">${issueDateString}</div><div class="individual-download-btns"><button class="btn-action btn-single btn-download-red" onclick="downloadSingle('${certId}', 'pdf')">PDF</button><button class="btn-action btn-single btn-download-red" onclick="downloadSingle('${certId}', 'png')">صورة</button></div></div>`;
                 
@@ -1384,8 +1560,6 @@
             document.getElementById('studentsList').value = ''; 
             renderWorkspaceCerts(); 
             showToast("تم إنشاء الإجازات بنجاح!"); 
-            saveLocalData();
-            saveGeneralDataToFirebase();
             saveCertsToFirebase(newGeneratedCerts);
         }
 
@@ -1399,14 +1573,11 @@
                 if (!cert.downloadedStatus) cert.downloadedStatus = [];
                 if (!cert.downloadedStatus.includes(type)) cert.downloadedStatus.push(type);
                 
-                if (!skipSave) {
-                    saveLocalData();
-                    saveCertsToFirebase([cert]); 
-                }
+                if (!skipSave) { saveCertsToFirebase([cert]); }
                 
                 const badges = document.querySelectorAll(`#global_${cardId} .badge, #${cardId} .badge`);
                 badges.forEach(b => {
-                    b.style.background = "var(--success)";
+                    b.classList.add('downloaded-badge');
                     if (cert.downloadedStatus.includes('pdf') && cert.downloadedStatus.includes('png')) b.innerText = "تم التحميل";
                     else if (cert.downloadedStatus.includes('pdf')) b.innerText = "تم التحميل كـ PDF";
                     else b.innerText = "تم التحميل كصورة";
@@ -1426,8 +1597,7 @@
             const fileName = getSafeFilename(`${folderNameStr} - ${student.studentName}`, type === 'png' && student.isUploadedPdf ? 'pdf' : type);
 
             if (student.isUploadedPdf) { 
-                downloadDataUrl(student.pdfDataUrl, fileName); 
-                markAsDownloaded(actualId, 'pdf', false); 
+                downloadDataUrl(student.pdfDataUrl, fileName); markAsDownloaded(actualId, 'pdf', false); 
                 if (wasCompact) grid.classList.add('view-compact'); 
                 return; 
             }
@@ -1435,10 +1605,8 @@
             toggleLoading(true, `جاري التوليد...`);
             try {
                 await new Promise(r => setTimeout(r, 100));
-                
                 let template = document.getElementById(actualId)?.querySelector('.ijazah-template');
                 if(!template) template = document.getElementById('global_' + actualId)?.querySelector('.ijazah-template');
-                
                 if(!template) throw new Error("لم يتم العثور على القالب للتحميل");
 
                 const scale = Math.min(6, Math.max(3, 2400 / (template.clientWidth || 400)));
@@ -1480,12 +1648,8 @@
                     }
                     saveAs(await zip.generateAsync({ type: 'blob' }), `${folderName}.zip`); showToast("تم التحميل بنجاح!");
                 } catch (e) { showToast("حدث خطأ.", true); } finally { 
-                    if (wasCompact) grid.classList.add('view-compact'); 
-                    toggleLoading(false); 
-                    cancelSelectMode(); 
-                    saveLocalData();
-                    const updatedCerts = sessionCertificates.filter(c => selectedIds.includes(c.id));
-                    saveCertsToFirebase(updatedCerts);
+                    if (wasCompact) grid.classList.add('view-compact'); toggleLoading(false); cancelSelectMode(); 
+                    const updatedCerts = sessionCertificates.filter(c => selectedIds.includes(c.id)); saveCertsToFirebase(updatedCerts);
                 }
             } 
             else if (mode === 'single') {
@@ -1509,12 +1673,8 @@
                     }
                     showToast("تم التحميل المباشر بنجاح!");
                 } catch (e) { showToast("حدث خطأ.", true); } finally { 
-                    if (wasCompact) grid.classList.add('view-compact'); 
-                    toggleLoading(false); 
-                    cancelSelectMode(); 
-                    saveLocalData();
-                    const updatedCerts = sessionCertificates.filter(c => selectedIds.includes(c.id));
-                    saveCertsToFirebase(updatedCerts); 
+                    if (wasCompact) grid.classList.add('view-compact'); toggleLoading(false); cancelSelectMode(); 
+                    const updatedCerts = sessionCertificates.filter(c => selectedIds.includes(c.id)); saveCertsToFirebase(updatedCerts); 
                 }
             }
         }
