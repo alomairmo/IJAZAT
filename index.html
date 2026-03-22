@@ -29,9 +29,9 @@
             --text-muted: #7f8c8d;
             
             /* هوامش الإجازة الديناميكية */
-            --cert-pt: 31.108%; /* 22 * 1.414 */
+            --cert-pt: 31.108%; 
             --cert-pr: 10%;
-            --cert-pb: 12.019%; /* 8.5 * 1.414 */
+            --cert-pb: 12.019%; 
             --cert-pl: 10%;
         }
 
@@ -44,9 +44,6 @@
         .header-left { display: flex; align-items: center; gap: 10px; }
         .icon-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 8px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; width: 42px; height: 42px;}
         .icon-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
-
-        #folderSearchContainer { display: none; margin-left: 10px; transition: 0.3s; }
-        #folderSearchContainer input { padding: 8px 15px; border-radius: 20px; border: none; outline: none; width: 200px; font-family: inherit;}
 
         #appContainer { display: flex; flex-grow: 1; overflow: hidden; width: 100%; }
 
@@ -546,7 +543,7 @@
 
     <script>
         // ==========================================
-        // بيانات جولة الشرح التعليمية مع التحديثات
+        // بيانات جولة الشرح التعليمية
         // ==========================================
         const tutorialSteps = {
             drive: [
@@ -689,7 +686,12 @@
             try {
                 const prompt = `أنت خبير في صياغة الإجازات العلمية الإسلامية والشهادات. اكتب نص إجازة علمية رصينة ومختصرة لكتاب "${bookName}". استخدم المتغيرات {الاسم الكامل} و {الاسم الاول} للإشارة إلى الشخص المُجاز. مثال: "فقد قرأ علي الأخ الفاضل {الاسم الكامل} كتاب كذا... وأجزتُ {الاسم الاول}...". ملاحظة: لا تكتب أي مقدمات أو خاتمة لكلامك، فقط اكتب نص الإجازة مباشرة لتكون جاهزة للنسخ.`;
                 const result = await callGeminiAPI(prompt);
-                if(result) { document.getElementById('ijazahText').value = result.trim(); showToast("تم توليد النص بنجاح! ✨"); saveData(); } 
+                if(result) { 
+                    document.getElementById('ijazahText').value = result.trim(); 
+                    showToast("تم توليد النص بنجاح! ✨"); 
+                    saveLocalData();
+                    saveGeneralDataToFirebase();
+                } 
                 else throw new Error("Empty response");
             } catch(e) { showToast("فشل الاتصال بالذكاء الاصطناعي.", true); }
             toggleLoading(false); document.getElementById('aiBookName').value = '';
@@ -710,7 +712,7 @@
         }
 
         // ==========================================
-        // إعدادات Firebase والمزامنة الحية (Real-time)
+        // إعدادات Firebase والمزامنة الحية المتقدمة (Real-time & Batch Sync)
         // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyB3ZmFK1Sxt1X_HYtW3dL7rE7Z4rLs9YfQ",
@@ -785,7 +787,10 @@
                 snapshot.forEach(doc => { loadedCerts.push(doc.data()); });
                 
                 if (isFirstLoad && snapshot.empty && sessionCertificates.length > 0) {
-                    saveData();
+                    // إذا كانت السحابة فارغة تماماً والذاكرة المحلية فيها بيانات، نرفع كل شيء
+                    saveLocalData();
+                    saveGeneralDataToFirebase();
+                    saveCertsToFirebase(sessionCertificates);
                 } else {
                     sessionCertificates = loadedCerts;
                     saveLocalData();
@@ -816,51 +821,78 @@
             } catch(e) { console.warn("مساحة التخزين المحلي ممتلئة."); }
         }
 
-        // --- التعديل الأساسي لمنع رسالة (resource-exhausted) بتجميع الطلبات ---
-        async function saveData() {
-            saveLocalData(); 
-            if (appDbClient) {
-                try {
-                    // تحديث الإعدادات والمجلدات
+        // --- دوال الحفظ الذكية المنفصلة (Delta Sync) ---
+        async function saveGeneralDataToFirebase() {
+            if (!appDbClient) return;
+            try {
+                await Promise.all([
                     appDbClient.collection('ijazah_data').doc('settings').set({ 
                         dateLabel: globalSettings.dateLabel, sheikhDetails: globalSettings.sheikhDetails, 
                         marginTop: globalSettings.marginTop, marginBottom: globalSettings.marginBottom, 
                         marginRight: globalSettings.marginRight, marginLeft: globalSettings.marginLeft 
-                    }).catch(e=>console.log(e));
-                    
+                    }),
                     appDbClient.collection('ijazah_data').doc('images').set({ 
                         signature: globalSettings.signatureBase64, background: globalSettings.backgroundBase64 
-                    }).catch(e=>console.log(e));
-                    
-                    appDbClient.collection('ijazah_data').doc('folders').set({ list: folders }).catch(e=>console.log(e));
-                    
-                    // استخدام الـ Batch لرفع الشهادات منعاً لاختناق السيرفر
-                    let batches = [];
-                    let currentBatch = appDbClient.batch();
-                    let opCount = 0;
+                    }),
+                    appDbClient.collection('ijazah_data').doc('folders').set({ list: folders })
+                ]);
+            } catch(e) { console.error("Error saving general data:", e); }
+        }
 
-                    sessionCertificates.forEach(cert => {
-                        let docRef = appDbClient.collection('ijazah_data').doc('certs').collection('items').doc(cert.id);
-                        currentBatch.set(docRef, cert);
-                        opCount++;
-                        
-                        // الحد الأقصى للـ Batch في فايربيس هو 500 عملية
-                        if (opCount === 400) {
-                            batches.push(currentBatch);
-                            currentBatch = appDbClient.batch();
-                            opCount = 0;
-                        }
-                    });
+        async function saveCertsToFirebase(certsArray) {
+            if (!appDbClient || !certsArray || certsArray.length === 0) return;
+            try {
+                let batches = [];
+                let currentBatch = appDbClient.batch();
+                let opCount = 0;
+
+                certsArray.forEach(cert => {
+                    let docRef = appDbClient.collection('ijazah_data').doc('certs').collection('items').doc(cert.id);
+                    currentBatch.set(docRef, cert);
+                    opCount++;
                     
-                    if (opCount > 0) batches.push(currentBatch);
-                    
-                    for (let batch of batches) {
-                        await batch.commit();
+                    if (opCount === 400) {
+                        batches.push(currentBatch);
+                        currentBatch = appDbClient.batch();
+                        opCount = 0;
                     }
-                } catch(e) {
-                    console.error("خطأ أثناء المزامنة السحابية: ", e);
+                });
+                
+                if (opCount > 0) batches.push(currentBatch);
+                
+                for (let batch of batches) {
+                    await batch.commit();
+                    await new Promise(r => setTimeout(r, 200)); // استراحة للسيرفر لمنع الاختناق
                 }
-            }
+            } catch(e) { console.error("Error saving certs to Firebase:", e); }
+        }
+
+        async function deleteCertsFromFirebase(certIdsArray) {
+            if (!appDbClient || !certIdsArray || certIdsArray.length === 0) return;
+            try {
+                let batches = [];
+                let currentBatch = appDbClient.batch();
+                let opCount = 0;
+                
+                certIdsArray.forEach(id => {
+                    let docRef = appDbClient.collection('ijazah_data').doc('certs').collection('items').doc(id);
+                    currentBatch.delete(docRef);
+                    opCount++;
+                    
+                    if (opCount === 400) {
+                        batches.push(currentBatch);
+                        currentBatch = appDbClient.batch();
+                        opCount = 0;
+                    }
+                });
+                
+                if (opCount > 0) batches.push(currentBatch);
+                
+                for (let batch of batches) {
+                    await batch.commit();
+                    await new Promise(r => setTimeout(r, 200)); // استراحة للسيرفر
+                }
+            } catch(e) { console.error("Error deleting certs from Firebase:", e); }
         }
 
         function sortArray(arr, sortType) {
@@ -1035,7 +1067,12 @@
             globalSettings.marginRight = parseFloat(document.getElementById('margRight').value);
             globalSettings.marginLeft = parseFloat(document.getElementById('margLeft').value);
             applyMarginsToRoot();
-            saveData(); closeModal('settingsModal'); showToast("تم حفظ الإعدادات بنجاح");
+            
+            saveLocalData();
+            saveGeneralDataToFirebase();
+            
+            closeModal('settingsModal'); 
+            showToast("تم حفظ الإعدادات بنجاح");
             if(document.getElementById('workspaceView').style.display === 'flex') { renderWorkspaceCerts(); }
         }
 
@@ -1048,7 +1085,14 @@
             const id = document.getElementById('renameFolderId').value, newName = document.getElementById('renameFolderInput').value.trim();
             if (!newName) return showToast("الرجاء كتابة اسم الملف", true);
             const folder = folders.find(f => f.id === id);
-            if (folder) { folder.name = newName; saveData(); executeGlobalSearchAndSort(); showToast("تم تغيير اسم الملف"); if (currentFolderId === id) document.getElementById('headerTitle').innerText = folder.name; }
+            if (folder) { 
+                folder.name = newName; 
+                saveLocalData();
+                saveGeneralDataToFirebase();
+                executeGlobalSearchAndSort(); 
+                showToast("تم تغيير اسم الملف"); 
+                if (currentFolderId === id) document.getElementById('headerTitle').innerText = folder.name; 
+            }
             closeModal('renameFolderModal');
         }
 
@@ -1056,7 +1100,11 @@
             const name = document.getElementById('newFolderName').value.trim();
             if (!name) return showToast("الرجاء كتابة اسم الملف", true);
             const newFolder = { id: "folder_" + Date.now(), name: name, templateText: "اكتب نص الإجازة هنا...\nاستخدم {الاسم الكامل} و {الاسم الاول} في أماكنها." };
-            folders.push(newFolder); saveData(); closeModal('newFolderModal'); document.getElementById('newFolderName').value = '';
+            folders.push(newFolder); 
+            saveLocalData();
+            saveGeneralDataToFirebase(); 
+            closeModal('newFolderModal'); 
+            document.getElementById('newFolderName').value = '';
             executeGlobalSearchAndSort(); openFolder(newFolder.id); 
         }
 
@@ -1097,7 +1145,14 @@
         }
 
         function goBackToDrive() {
-            if(currentFolderId) { const folder = folders.find(f => f.id === currentFolderId); if(folder) { folder.templateText = document.getElementById('ijazahText').value; saveData(); } }
+            if(currentFolderId) { 
+                const folder = folders.find(f => f.id === currentFolderId); 
+                if(folder) { 
+                    folder.templateText = document.getElementById('ijazahText').value; 
+                    saveLocalData();
+                    saveGeneralDataToFirebase();
+                } 
+            }
             updateHeaderMode('drive'); document.getElementById('workspaceView').style.display = 'none'; document.getElementById('driveView').style.display = 'flex';
             currentFolderId = null; executeGlobalSearchAndSort(); 
         }
@@ -1209,41 +1264,16 @@
 
         function confirmDelete() { if (document.querySelectorAll('.delete-checkbox:checked').length === 0) return showToast("حدد إجازة واحدة على الأقل.", true); document.getElementById('deleteModal').style.display = 'flex'; }
 
-        // --- تعديل الحذف ليعمل بنظام المجموعات Batch ---
         async function executeDelete() {
             closeModal('deleteModal');
             const selectedIds = Array.from(document.querySelectorAll('.delete-checkbox:checked')).map(cb => cb.value);
             sessionCertificates = sessionCertificates.filter(c => !selectedIds.includes(c.id));
             
-            if (appDbClient) {
-                try {
-                    let batches = [];
-                    let currentBatch = appDbClient.batch();
-                    let opCount = 0;
-                    
-                    selectedIds.forEach(id => {
-                        let docRef = appDbClient.collection('ijazah_data').doc('certs').collection('items').doc(id);
-                        currentBatch.delete(docRef);
-                        opCount++;
-                        
-                        if (opCount === 400) {
-                            batches.push(currentBatch);
-                            currentBatch = appDbClient.batch();
-                            opCount = 0;
-                        }
-                    });
-                    
-                    if (opCount > 0) batches.push(currentBatch);
-                    
-                    for (let batch of batches) {
-                        await batch.commit();
-                    }
-                } catch(e) {
-                    console.error("خطأ في الحذف: ", e);
-                }
-            }
-
-            cancelSelectMode(); renderWorkspaceCerts(); saveLocalData(); showToast("تم الحذف بنجاح.");
+            cancelSelectMode(); 
+            renderWorkspaceCerts(); 
+            saveLocalData(); 
+            deleteCertsFromFirebase(selectedIds);
+            showToast("تم الحذف بنجاح.");
         }
 
         function openMoveModal() {
@@ -1258,21 +1288,35 @@
             const targetId = document.getElementById('targetFolderSelect').value;
             if (!targetId) return showToast("الرجاء إنشاء مجلد وجهة أولاً", true);
             const selectedIds = Array.from(document.querySelectorAll('.delete-checkbox:checked')).map(cb => cb.value);
-            sessionCertificates.forEach(c => { if(selectedIds.includes(c.id)) c.folderId = targetId; });
-            closeModal('moveModal'); cancelSelectMode(); renderWorkspaceCerts(); saveData(); showToast("تم نقل الملفات بنجاح!");
+            let movedCerts = [];
+            sessionCertificates.forEach(c => { 
+                if(selectedIds.includes(c.id)) {
+                    c.folderId = targetId;
+                    movedCerts.push(c);
+                } 
+            });
+            closeModal('moveModal'); 
+            cancelSelectMode(); 
+            renderWorkspaceCerts(); 
+            saveLocalData();
+            saveCertsToFirebase(movedCerts);
+            showToast("تم نقل الملفات بنجاح!");
         }
 
-        // --- تعديل رفع الـ PDF ليقوم بالحفظ فقط بعد انتهاء جميع الملفات ---
         function handleOldPdfUpload(event) {
             const files = event.target.files; if (!files || files.length === 0) return;
             
             let processedCount = 0;
+            let newlyUploadedCerts = [];
             
             Array.from(files).forEach(file => {
                 if (file.type !== "application/pdf") {
                     showToast("الرجاء رفع ملف PDF فقط", true);
                     processedCount++;
-                    if(processedCount === files.length) saveData();
+                    if(processedCount === files.length) {
+                        saveLocalData();
+                        saveCertsToFirebase(newlyUploadedCerts);
+                    }
                     return;
                 }
                 const reader = new FileReader();
@@ -1280,15 +1324,18 @@
                     const certId = 'cert_' + Date.now() + '_' + Math.floor(Math.random()*1000);
                     const name = file.name.replace('.pdf', '');
                     const innerHTML = `<input type="checkbox" class="delete-checkbox" value="${certId}"><span class="badge uploaded-badge" id="badge_${certId}">مرفق قديم</span><div class="cert-thumbnail"><svg viewBox="0 0 24 24"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"/></svg><span class="cert-thumbnail-label">ملف PDF مرفوع</span></div><div class="cert-info"><div class="cert-name" title="${name}">${name}</div><div class="cert-date">${new Date().toLocaleDateString('ar-SA')}</div><div class="individual-download-btns"><button class="btn-action btn-single btn-download-red" onclick="downloadSingle('${certId}', 'pdf')">تحميل الملف</button></div></div>`;
-                    sessionCertificates.push({ id: certId, folderId: currentFolderId, studentName: name, timestamp: Date.now(), isUploadedPdf: true, pdfDataUrl: e.target.result, cardInnerHTML: innerHTML, downloadedStatus: [] });
-                    renderWorkspaceCerts(); showToast("تم إرفاق الملف بنجاح!");
+                    let newCert = { id: certId, folderId: currentFolderId, studentName: name, timestamp: Date.now(), isUploadedPdf: true, pdfDataUrl: e.target.result, cardInnerHTML: innerHTML, downloadedStatus: [] };
+                    sessionCertificates.push(newCert);
+                    newlyUploadedCerts.push(newCert);
+                    renderWorkspaceCerts(); showToast("تم إرفاق الملف بنجاح!"); 
                     
                     processedCount++;
-                    if(processedCount === files.length) saveData(); // حفظ مجمّع
-                }; 
-                reader.readAsDataURL(file);
-            }); 
-            event.target.value = '';
+                    if(processedCount === files.length) {
+                        saveLocalData();
+                        saveCertsToFirebase(newlyUploadedCerts);
+                    }
+                }; reader.readAsDataURL(file);
+            }); event.target.value = '';
         }
 
         function generateCertificates() {
@@ -1313,6 +1360,8 @@
             const pl = globalSettings.marginLeft !== undefined ? globalSettings.marginLeft : 10;
 
             let processIndex = 0;
+            let newGeneratedCerts = [];
+
             while(processIndex < lines.length) {
                 let full = lines[processIndex].trim(); let first = full;
                 if (format === 'full_and_first') { first = lines[processIndex+1] ? lines[processIndex+1].trim() : full; processIndex += 2; } else { processIndex++; }
@@ -1326,23 +1375,34 @@
                 let finalIjazahHtml = textWithFootnoteRefs.replace(/\n/g, '<br>').replace(/{الاسم الكامل}/g, `<strong>${full}</strong>`).replace(/{الاسم الاول}/g, `<strong>${first}</strong>`);
                 let certId = 'cert_' + Date.now() + '_' + processIndex;
                 let innerHTML = `<input type="checkbox" class="delete-checkbox" value="${certId}"><span class="badge" id="badge_${certId}">جديد</span><div class="cert-thumbnail"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg><span class="cert-thumbnail-label">وثيقة الإجازة</span></div><div class="cert-capture-area"><div class="ijazah-template needs-adjustment" style="padding: ${pt}% ${pr}% ${pb}% ${pl}%;">${bgImgHtml} <div class="ijazah-content">${finalIjazahHtml}</div><div class="ijazah-footer"><div class="signature-block"><div style="visibility: hidden; line-height: 1.5; font-weight: bold;">${sheikhDetailsHtml.split('<br>')[0] || 'وكتب'}</div><div style="font-weight:bold; line-height: 1.5;">${dateLabelText}</div><div style="line-height: 1.5;">${date}</div></div><div class="signature-block"><div class="author-info">${sheikhDetailsHtml}</div>${signatureHtml}</div></div>${footnotesHtml}</div></div><div class="cert-info"><div class="cert-name" title="${full}">${full}</div><div class="cert-date">${issueDateString}</div><div class="individual-download-btns"><button class="btn-action btn-single btn-download-red" onclick="downloadSingle('${certId}', 'pdf')">PDF</button><button class="btn-action btn-single btn-download-red" onclick="downloadSingle('${certId}', 'png')">صورة</button></div></div>`;
-                sessionCertificates.push({ id: certId, folderId: currentFolderId, studentName: full, timestamp: Date.now(), isUploadedPdf: false, cardInnerHTML: innerHTML, downloadedStatus: [] });
+                
+                let certObj = { id: certId, folderId: currentFolderId, studentName: full, timestamp: Date.now(), isUploadedPdf: false, cardInnerHTML: innerHTML, downloadedStatus: [] };
+                sessionCertificates.push(certObj);
+                newGeneratedCerts.push(certObj);
             }
-            document.getElementById('studentsList').value = ''; renderWorkspaceCerts(); showToast("تم إنشاء الإجازات بنجاح!"); saveData();
+            
+            document.getElementById('studentsList').value = ''; 
+            renderWorkspaceCerts(); 
+            showToast("تم إنشاء الإجازات بنجاح!"); 
+            saveLocalData();
+            saveGeneralDataToFirebase();
+            saveCertsToFirebase(newGeneratedCerts);
         }
 
         function getSafeFilename(name, ext) { return name.replace(/[<>:"\/\\|?*]/g, '').trim() + '.' + ext; }
         function downloadDataUrl(dataUrl, filename) { const link = document.createElement("a"); link.href = dataUrl; link.download = filename; link.click(); }
         function base64ToBlob(base64, mimeType) { const parts = base64.split(';base64,'); const decodedData = window.atob(parts[1]); const uInt8Array = new Uint8Array(decodedData.length); for (let i = 0; i < decodedData.length; ++i) { uInt8Array[i] = decodedData.charCodeAt(i); } return new Blob([uInt8Array], { type: mimeType }); }
         
-        // --- تعديل لتمكين تخطي الحفظ المتكرر ---
         function markAsDownloaded(cardId, type, skipSave = false) {
             const cert = sessionCertificates.find(c => c.id === cardId);
             if (cert) {
                 if (!cert.downloadedStatus) cert.downloadedStatus = [];
                 if (!cert.downloadedStatus.includes(type)) cert.downloadedStatus.push(type);
                 
-                if (!skipSave) saveData(); 
+                if (!skipSave) {
+                    saveLocalData();
+                    saveCertsToFirebase([cert]); 
+                }
                 
                 const badges = document.querySelectorAll(`#global_${cardId} .badge, #${cardId} .badge`);
                 badges.forEach(b => {
@@ -1419,7 +1479,14 @@
                         markAsDownloaded(certId, type, true);
                     }
                     saveAs(await zip.generateAsync({ type: 'blob' }), `${folderName}.zip`); showToast("تم التحميل بنجاح!");
-                } catch (e) { showToast("حدث خطأ.", true); } finally { if (wasCompact) grid.classList.add('view-compact'); toggleLoading(false); cancelSelectMode(); saveData(); }
+                } catch (e) { showToast("حدث خطأ.", true); } finally { 
+                    if (wasCompact) grid.classList.add('view-compact'); 
+                    toggleLoading(false); 
+                    cancelSelectMode(); 
+                    saveLocalData();
+                    const updatedCerts = sessionCertificates.filter(c => selectedIds.includes(c.id));
+                    saveCertsToFirebase(updatedCerts);
+                }
             } 
             else if (mode === 'single') {
                 toggleLoading(true, `جاري تحميل ${selectedIds.length} ملفات مباشرة...`);
@@ -1441,7 +1508,14 @@
                         await new Promise(r => setTimeout(r, 600)); 
                     }
                     showToast("تم التحميل المباشر بنجاح!");
-                } catch (e) { showToast("حدث خطأ.", true); } finally { if (wasCompact) grid.classList.add('view-compact'); toggleLoading(false); cancelSelectMode(); saveData(); }
+                } catch (e) { showToast("حدث خطأ.", true); } finally { 
+                    if (wasCompact) grid.classList.add('view-compact'); 
+                    toggleLoading(false); 
+                    cancelSelectMode(); 
+                    saveLocalData();
+                    const updatedCerts = sessionCertificates.filter(c => selectedIds.includes(c.id));
+                    saveCertsToFirebase(updatedCerts); 
+                }
             }
         }
     </script>
