@@ -13,7 +13,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     
-    <!-- خط شهرزاد الجديد والخطوط الأساسية مع إضافة خط Reem Kufi -->
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700&family=Reem+Kufi:wght@400;700&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
@@ -117,7 +116,6 @@
         .cert-card { background: var(--surface); border: 2px solid transparent; border-radius: 12px; position: relative; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: 0.2s; overflow: hidden; }
         .cert-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
         
-        /* 1. إجبار ألوان الأوسمة لتكون واضحة دائماً لكافة الشهادات القديمة والجديدة */
         .cert-card .badge, .cert-card .badge.uploaded-badge { position: absolute; top: 15px; right: 15px; background: var(--primary) !important; color: white !important; font-size: 0.75rem; padding: 4px 10px; border-radius: 12px; z-index: 5 !important; font-weight: bold !important; transition: background 0.3s; opacity: 1 !important;}
         .cert-card .badge.downloaded-badge { background: var(--success) !important; }
         
@@ -130,54 +128,51 @@
 
         .cert-capture-area { padding: 15px; background: #fdfdfd; border-bottom: 1px solid #eee; overflow: hidden;}
         
-        /* === تنسيق الإجازة الحقيقي (التعديلات الجوهرية) === */
+        /* === تنسيق الإجازة الحقيقي === */
         .ijazah-template { 
             width: 100%; aspect-ratio: 1 / 1.414; background-color: #ffffff; 
             padding: var(--cert-pt) var(--cert-pr) var(--cert-pb) var(--cert-pl); 
             box-sizing: border-box; color: #1a1a1a; position: relative; overflow: hidden; 
-            display: flex; flex-direction: column; justify-content: flex-start; /* لدفع التوقيع للأعلى ليلتصق بالنص */
+            display: flex; flex-direction: column; justify-content: flex-start; 
             box-shadow: inset 0 0 20px rgba(0,0,0,0.02); 
         }
         .template-bg-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: fill; z-index: 0; pointer-events: none; }
         
-        /* تطبيق خط أضواء السلف والمحاذاة التامة كالوورد */
         .ijazah-content { 
             position: relative; 
             font-family: 'Adwa Assalaf', 'Scheherazade New', 'Amiri', serif !important; 
-            font-weight: 700 !important; /* بولد دائماً */
+            font-weight: 700 !important; 
             text-align: justify !important; 
-            text-justify: inter-word !important; /* المحاذاة التامة */
-            text-align-last: right !important; /* السطر الأخير القصير يكون لليمين كالوورد */
+            text-justify: inter-word !important; 
+            text-align-last: right !important; 
             line-height: 1.8; 
-            margin-bottom: 0 !important; /* تم الإلغاء لنقل المسافة للفوتر وتوحيدها */
+            margin-bottom: 0 !important; 
             font-size: 1.25em; 
             z-index: 1; 
-            flex-grow: 0 !important; /* إلغاء التمدد ليصعد التوقيع للأعلى */
+            flex-grow: 0 !important; 
         }
         
-        /* تمييز اسم الطالب والكلمات المحددة بخط مختلف وبنفس الحجم */
         .ijazah-content strong { 
             font-family: 'Reem Kufi', 'Amiri', serif !important; 
             font-weight: 700 !important; 
             color: #000; 
-            font-size: 1em !important; 
+            font-size: 1.3em !important; 
             padding: 0 4px;
         }
         
         .footnote-ref { font-size: 0.7em; vertical-align: super; color: #c0392b; font-weight: bold; padding: 0 1px; }
         
-        /* تحديث الفوتر: خط أضواء السلف، عريض، حجم أكبر، ومسافة سطر واحد فقط */
         .ijazah-footer { 
             position: relative; display: flex; justify-content: space-between; align-items: flex-start; 
             z-index: 1; 
             font-family: 'Adwa Assalaf', 'Scheherazade New', 'Amiri', serif !important; 
             font-weight: 700 !important;
             flex-shrink: 0; 
-            margin-top: 1.8em !important; /* مقدار سطر واحد فقط (مطابق لارتفاع سطر المتن) */
+            margin-top: 1.2em !important; 
         }
         .signature-block { 
             text-align: center; 
-            font-size: 1.35em !important; /* أكبر قليلاً من المتن (1.25em) */
+            font-size: 1.35em !important; 
             color: #1a1a1a; 
             flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; 
             min-height: 5em; 
@@ -194,7 +189,6 @@
         .cert-date { font-size: 0.85rem; color: var(--text-muted); text-align: center; }
         .individual-download-btns { display: flex; gap: 10px; justify-content: center; }
         
-        /* 3. إجبار ألوان أزرار التحميل القديمة والجديدة للون الأحمر التام */
         .cert-card .cert-info .individual-download-btns button { 
             background: linear-gradient(135deg, var(--danger) 0%, var(--danger-dark) 100%) !important; 
             color: white !important; 
@@ -207,11 +201,7 @@
             transform: translateY(-1px); box-shadow: 0 4px 6px rgba(192, 57, 43, 0.3) !important;
         }
         .cert-card .cert-info .individual-download-btns button:active { transform: scale(0.97); }
-        
-        /* جعل الأزرار باهتة فقط عند تفعيل وضع التحديد */
-        .view-select-mode .cert-card .cert-info .individual-download-btns button { 
-            background: #e0e0e0 !important; color: #999 !important; pointer-events: none !important; opacity: 0.7 !important; box-shadow: none !important;
-        }
+        .view-select-mode .cert-card .cert-info .individual-download-btns button { background: #e0e0e0 !important; color: #999 !important; pointer-events: none !important; opacity: 0.7 !important; box-shadow: none !important;}
 
         .pdf-uploaded-card .cert-thumbnail { display: flex !important; height: 250px; background: #fdfdfd; border-bottom: 1px solid #eee; align-items: center; justify-content: center; flex-direction: column; color: var(--danger); }
         .pdf-uploaded-card .cert-thumbnail svg { width: 80px; height: 80px; margin-bottom: 15px; fill: currentColor; }
@@ -368,7 +358,6 @@
         </div>
     </div>
     
-    <!-- نافذة إضافة إجازة مخصصة للطالب -->
     <div id="studentIjazahModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 400px;">
             <button class="close-modal-btn" onclick="closeModal('studentIjazahModal')">&times;</button>
@@ -914,6 +903,106 @@
             } catch(e) { console.warn("مساحة التخزين المحلي ممتلئة."); }
         }
 
+        // ==========================================
+        // مراقب الأبعاد اللحظي لمنع اللاق والوميض 
+        // ==========================================
+        const certResizeObserver = new ResizeObserver(entries => {
+            let migrationNeeded = false;
+            for (let entry of entries) {
+                const template = entry.target;
+                if (template.clientWidth === 0) continue;
+
+                if (template.dataset.fontRatio) {
+                    const ratio = parseFloat(template.dataset.fontRatio);
+                    template.style.fontSize = (template.clientWidth * ratio) + 'px';
+                } else {
+                    template.classList.add('needs-migration');
+                    migrationNeeded = true;
+                }
+            }
+            
+            if (migrationNeeded) {
+                // ترقية الشهادات القديمة الخالية من النسبة الذهبية
+                setTimeout(() => {
+                    let needsSave = false;
+                    let certsToUpdate = [];
+                    
+                    document.querySelectorAll('.ijazah-template.needs-migration').forEach(template => {
+                        if (template.clientWidth === 0) return; 
+
+                        let size = Math.max(14, template.clientWidth * 0.038);
+                        let iters = 0;
+                        let minSize = template.clientWidth * 0.015;
+                        template.style.fontSize = size + 'px';
+                        
+                        while (template.scrollHeight > template.clientHeight + 2 && size > minSize && iters < 150) { 
+                            size -= Math.max(0.1, template.clientWidth * 0.001); 
+                            template.style.fontSize = size + 'px'; 
+                            iters++; 
+                        }
+                        
+                        template.classList.remove('needs-migration');
+                        const ratio = size / template.clientWidth;
+                        template.dataset.fontRatio = ratio;
+                        
+                        const card = template.closest('.cert-card');
+                        if (card && card.id) {
+                            const certId = card.id.replace('global_', '');
+                            const certObj = sessionCertificates.find(c => c.id === certId);
+                            if (certObj) {
+                                certObj.fontSizeRatio = ratio;
+                                
+                                let newHTML = certObj.cardInnerHTML.replace(/class=["']ijazah-template[^"']*["']/, `class="ijazah-template" data-font-ratio="${ratio}"`);
+                                if (!newHTML.includes('data-font-ratio')) {
+                                    newHTML = newHTML.replace('<div class="ijazah-template"', `<div class="ijazah-template" data-font-ratio="${ratio}"`);
+                                }
+                                certObj.cardInnerHTML = newHTML;
+                                
+                                certsToUpdate.push(certObj);
+                                needsSave = true;
+                            }
+                        }
+                    });
+
+                    if (needsSave && certsToUpdate.length > 0) {
+                        saveCertsToFirebase(certsToUpdate); 
+                    }
+                }, 100);
+            }
+        });
+
+        function calculateFontSizeRatioOffscreen(contentHtml, paddingStyle) {
+            let container = document.getElementById('offscreen-calc-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'offscreen-calc-container';
+                container.style.position = 'absolute';
+                container.style.top = '-9999px';
+                container.style.left = '-9999px';
+                container.style.width = '800px'; 
+                container.style.height = (800 * 1.414) + 'px';
+                container.style.visibility = 'hidden';
+                document.body.appendChild(container);
+            }
+
+            container.innerHTML = `<div class="ijazah-template" style="${paddingStyle}">${contentHtml}</div>`;
+            const template = container.firstChild;
+
+            let size = 800 * 0.038;
+            let iters = 0;
+            let minSize = 800 * 0.015;
+            template.style.fontSize = size + 'px';
+            
+            while (template.scrollHeight > template.clientHeight + 2 && size > minSize && iters < 150) { 
+                size -= 0.5; 
+                template.style.fontSize = size + 'px'; 
+                iters++; 
+            }
+            
+            container.innerHTML = ''; 
+            return size / 800;
+        }
+
         async function saveGeneralDataToFirebase() {
             saveLocalData();
             if (!appDbClient) return;
@@ -1050,6 +1139,7 @@
                     cGrid.appendChild(card);
                 });
                 injectDynamicImages(cGrid); 
+                document.querySelectorAll('#globalCertsGrid .ijazah-template').forEach(t => certResizeObserver.observe(t));
             } else {
                 certsSection.style.display = 'none';
             }
@@ -1109,7 +1199,7 @@
             const folder = folders.find(f => f.id === folderId);
             if(!folder || !fullName) return;
 
-            let textTemplate = folder.templateText;
+            let textTemplate = folder.templateText.trim();
             const bgImgHtml = `<img src="" data-type="background" class="template-bg-img dynamic-img" alt="خلفية الإجازة" style="display: none;">`;
             const signatureHtml = `<img src="" data-type="signature" class="signature-img dynamic-img" alt="التوقيع" style="display: none;"><div class="sig-placeholder" style="display: none;"><br>......................</div>`;
             const sheikhDetailsHtml = globalSettings.sheikhDetails.replace(/\n/g, '<br>');
@@ -1131,7 +1221,11 @@
             
             let certId = 'cert_' + Date.now() + '_' + Math.floor(Math.random()*1000);
             
-            let innerHTML = `<input type="checkbox" class="delete-checkbox" value="${certId}"><span class="badge" id="badge_${certId}">جديد</span><div class="cert-thumbnail"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg><span class="cert-thumbnail-label">وثيقة الإجازة</span></div><div class="cert-capture-area"><div class="ijazah-template needs-adjustment" style="padding: ${pt}% ${pr}% ${pb}% ${pl}%;">${bgImgHtml} <div class="ijazah-content">${finalIjazahHtml}</div><div class="ijazah-footer"><div class="signature-block"><div style="visibility: hidden; line-height: 1.5; font-weight: bold;">${sheikhDetailsHtml.split('<br>')[0] || 'وكتب'}</div><div style="font-weight:bold; line-height: 1.5;">${dateLabelText}</div><div style="line-height: 1.5;">${issueDateString}</div></div><div class="signature-block"><div class="author-info">${sheikhDetailsHtml}</div>${signatureHtml}</div></div>${footnotesHtml}</div></div><div class="cert-info"><div class="cert-name" title="${fullName}">${fullName}</div><div class="cert-date">${issueDateString}</div><div class="individual-download-btns"><button class="btn-action btn-single btn-download-red" onclick="downloadSingle('${certId}', 'pdf')">PDF</button><button class="btn-action btn-single btn-download-red" onclick="downloadSingle('${certId}', 'png')">صورة</button></div></div>`;
+            let templateInner = `${bgImgHtml} <div class="ijazah-content">${finalIjazahHtml}</div><div class="ijazah-footer"><div class="signature-block"><div style="visibility: hidden; line-height: 1.5; font-weight: bold;">${sheikhDetailsHtml.split('<br>')[0] || 'وكتب'}</div><div style="font-weight:bold; line-height: 1.5;">${dateLabelText}</div><div style="line-height: 1.5;">${issueDateString}</div></div><div class="signature-block"><div class="author-info">${sheikhDetailsHtml}</div>${signatureHtml}</div></div>${footnotesHtml}`;
+            let paddingStyle = `padding: ${pt}% ${pr}% ${pb}% ${pl}%;`;
+            let ratio = calculateFontSizeRatioOffscreen(templateInner, paddingStyle);
+
+            let innerHTML = `<input type="checkbox" class="delete-checkbox" value="${certId}"><span class="badge" id="badge_${certId}">جديد</span><div class="cert-thumbnail"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg><span class="cert-thumbnail-label">وثيقة الإجازة</span></div><div class="cert-capture-area"><div class="ijazah-template" data-font-ratio="${ratio}" style="${paddingStyle}">${templateInner}</div></div><div class="cert-info"><div class="cert-name" title="${fullName}">${fullName}</div><div class="cert-date">${issueDateString}</div><div class="individual-download-btns"><button class="btn-action btn-single btn-download-red" onclick="downloadSingle('${certId}', 'pdf')">PDF</button><button class="btn-action btn-single btn-download-red" onclick="downloadSingle('${certId}', 'png')">صورة</button></div></div>`;
             
             let certObj = { id: certId, folderId: folderId, studentName: fullName, timestamp: Date.now(), isUploadedPdf: false, cardInnerHTML: innerHTML, downloadedStatus: [] };
             
@@ -1403,7 +1497,9 @@
             });
 
             injectDynamicImages(grid);
-            setTimeout(autoAdjustFontSize, 50);
+            
+            // مراقبة كافة الشهادات لتطبيق النسبة دون أي تأخير
+            document.querySelectorAll('#certificatesGrid .ijazah-template').forEach(t => certResizeObserver.observe(t));
         }
 
         function updateInstructions() {
@@ -1414,27 +1510,8 @@
         function toggleView(mode) {
             const grid = document.getElementById('certificatesGrid');
             if (mode === 'compact') { grid.classList.add('view-compact'); document.getElementById('btnCompactView').classList.add('active'); document.getElementById('btnDetailedView').classList.remove('active'); } 
-            else { grid.classList.remove('view-compact'); document.getElementById('btnDetailedView').classList.add('active'); document.getElementById('btnCompactView').classList.remove('active'); setTimeout(autoAdjustFontSize, 50);}
+            else { grid.classList.remove('view-compact'); document.getElementById('btnDetailedView').classList.add('active'); document.getElementById('btnCompactView').classList.remove('active'); }
         }
-
-        function autoAdjustFontSize() {
-            document.querySelectorAll('.ijazah-template.needs-adjustment').forEach(template => {
-                let size = Math.max(14, template.clientWidth * 0.038), iters = 0, minSize = template.clientWidth * 0.015;
-                template.style.fontSize = size + 'px';
-                while (template.scrollHeight > template.clientHeight + 2 && size > minSize && iters < 150) { size -= Math.max(0.1, template.clientWidth * 0.001); template.style.fontSize = size + 'px'; iters++; }
-                template.classList.remove('needs-adjustment');
-            });
-        }
-
-        window.addEventListener('resize', () => {
-            if(document.getElementById('workspaceView').style.display === 'flex') {
-                clearTimeout(window.resizeTimer); window.resizeTimer = setTimeout(() => {
-                    if(!document.getElementById('certificatesGrid').classList.contains('view-compact')){
-                        document.querySelectorAll('.ijazah-template').forEach(t => t.classList.add('needs-adjustment')); autoAdjustFontSize();
-                    }
-                }, 250);
-            }
-        });
 
         function toggleSelectMode() {
             let folderCerts = [];
@@ -1514,7 +1591,7 @@
         function generateCertificates() {
             const date = document.getElementById('ijazahDate').value;
             const format = document.getElementById('nameFormat').value;
-            let textTemplate = document.getElementById('ijazahText').value;
+            let textTemplate = document.getElementById('ijazahText').value.trim();
             const lines = document.getElementById('studentsList').value.split('\n').filter(line => line.trim() !== '');
             const issueDateString = new Date().toLocaleDateString('ar-SA');
             const enableFootnotes = document.getElementById('enableFootnotesToggle').checked;
@@ -1550,7 +1627,12 @@
                                         .replace(/{الاسم الكامل}/g, `<strong>${full}</strong>`)
                                         .replace(/{الاسم الاول}/g, `<strong>${first}</strong>`);
                 let certId = 'cert_' + Date.now() + '_' + processIndex;
-                let innerHTML = `<input type="checkbox" class="delete-checkbox" value="${certId}"><span class="badge" id="badge_${certId}">جديد</span><div class="cert-thumbnail"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg><span class="cert-thumbnail-label">وثيقة الإجازة</span></div><div class="cert-capture-area"><div class="ijazah-template needs-adjustment" style="padding: ${pt}% ${pr}% ${pb}% ${pl}%;">${bgImgHtml} <div class="ijazah-content">${finalIjazahHtml}</div><div class="ijazah-footer"><div class="signature-block"><div style="visibility: hidden; line-height: 1.5; font-weight: bold;">${sheikhDetailsHtml.split('<br>')[0] || 'وكتب'}</div><div style="font-weight:bold; line-height: 1.5;">${dateLabelText}</div><div style="line-height: 1.5;">${date}</div></div><div class="signature-block"><div class="author-info">${sheikhDetailsHtml}</div>${signatureHtml}</div></div>${footnotesHtml}</div></div><div class="cert-info"><div class="cert-name" title="${full}">${full}</div><div class="cert-date">${issueDateString}</div><div class="individual-download-btns"><button class="btn-action btn-single btn-download-red" onclick="downloadSingle('${certId}', 'pdf')">PDF</button><button class="btn-action btn-single btn-download-red" onclick="downloadSingle('${certId}', 'png')">صورة</button></div></div>`;
+                
+                let templateInner = `${bgImgHtml} <div class="ijazah-content">${finalIjazahHtml}</div><div class="ijazah-footer"><div class="signature-block"><div style="visibility: hidden; line-height: 1.5; font-weight: bold;">${sheikhDetailsHtml.split('<br>')[0] || 'وكتب'}</div><div style="font-weight:bold; line-height: 1.5;">${dateLabelText}</div><div style="line-height: 1.5;">${date}</div></div><div class="signature-block"><div class="author-info">${sheikhDetailsHtml}</div>${signatureHtml}</div></div>${footnotesHtml}`;
+                let paddingStyle = `padding: ${pt}% ${pr}% ${pb}% ${pl}%;`;
+                let ratio = calculateFontSizeRatioOffscreen(templateInner, paddingStyle);
+
+                let innerHTML = `<input type="checkbox" class="delete-checkbox" value="${certId}"><span class="badge" id="badge_${certId}">جديد</span><div class="cert-thumbnail"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg><span class="cert-thumbnail-label">وثيقة الإجازة</span></div><div class="cert-capture-area"><div class="ijazah-template" data-font-ratio="${ratio}" style="${paddingStyle}">${templateInner}</div></div><div class="cert-info"><div class="cert-name" title="${full}">${full}</div><div class="cert-date">${issueDateString}</div><div class="individual-download-btns"><button class="btn-action btn-single btn-download-red" onclick="downloadSingle('${certId}', 'pdf')">PDF</button><button class="btn-action btn-single btn-download-red" onclick="downloadSingle('${certId}', 'png')">صورة</button></div></div>`;
                 
                 let certObj = { id: certId, folderId: currentFolderId, studentName: full, timestamp: Date.now(), isUploadedPdf: false, cardInnerHTML: innerHTML, downloadedStatus: [] };
                 sessionCertificates.push(certObj);
