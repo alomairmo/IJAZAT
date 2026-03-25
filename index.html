@@ -60,7 +60,6 @@
         .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #aaa; font-size: 1.2rem; pointer-events: none;}
         .sort-select { padding: 12px 15px; border-radius: 30px; border: 1px solid #ccc; font-family: inherit; outline: none; cursor: pointer; background: white; font-size: 0.95rem; font-weight: 500;}
 
-        /* أزرار التبديل بين التصنيفات */
         .mode-toggles { display: flex; gap: 10px; background: #eee; padding: 5px; border-radius: 30px; }
         .btn-mode { background: transparent; color: var(--text-main); border: none; padding: 8px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; font-family: inherit; transition: 0.3s; font-size: 0.9rem;}
         .btn-mode.active { background: var(--dome-green); color: white; box-shadow: 0 2px 8px rgba(0,122,61,0.3); }
@@ -128,7 +127,6 @@
 
         .cert-capture-area { padding: 15px; background: #fdfdfd; border-bottom: 1px solid #eee; overflow: hidden;}
         
-        /* === تنسيق الإجازة الحقيقي === */
         .ijazah-template { 
             width: 100%; aspect-ratio: 1 / 1.414; background-color: #ffffff; 
             padding: var(--cert-pt) var(--cert-pr) var(--cert-pb) var(--cert-pl); 
@@ -146,7 +144,7 @@
             text-justify: inter-word !important; 
             text-align-last: right !important; 
             line-height: 1.8; 
-            margin-bottom: 0 !important; 
+            margin-bottom: 1.5em !important; 
             font-size: 1.25em; 
             z-index: 1; 
             flex-grow: 0 !important; 
@@ -168,7 +166,7 @@
             font-family: 'Adwa Assalaf', 'Scheherazade New', 'Amiri', serif !important; 
             font-weight: 700 !important;
             flex-shrink: 0; 
-            margin-top: 1.2em !important; 
+            margin-top: 1.8em !important; 
         }
         .signature-block { 
             text-align: center; 
@@ -261,6 +259,7 @@
         #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 8px; padding: 16px 20px; position: fixed; z-index: 10000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
         #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
 
+        /* Tutorial Overlays */
         .tutorial-overlay-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10002; backdrop-filter: blur(2px); transition: 0.3s; }
         .tutorial-highlight { position: relative !important; z-index: 10003 !important; border-radius: 8px; pointer-events: none; transition: all 0.3s ease; box-shadow: 0 0 0 4px var(--dome-green), 0 0 20px rgba(0,0,0,0.3) !important; background-color: transparent !important;}
         .tutorial-tooltip { display: none; position: fixed; background: white; padding: 20px; border-radius: 12px; z-index: 10004; width: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 2px solid var(--dome-green); opacity: 0; transition: all 0.3s ease; }
@@ -295,13 +294,44 @@
     <div id="tutorialTooltip" class="tutorial-tooltip">
         <h4 id="tutorialTitle">💡 معلومة</h4>
         <div class="tutorial-content" id="tutorialContent">شرح الميزة...</div>
-        <div class="modal-actions" style="margin-top: 0;">
-            <button class="btn-secondary" onclick="endTutorial()" style="padding: 6px 12px; font-size: 0.85rem;">تخطي</button>
-            <button class="btn-primary" onclick="nextTutorialStep()" id="tutorialNextBtn" style="padding: 6px 12px; font-size: 0.85rem;">التالي</button>
+        <div class="modal-actions" style="margin-top: 0; justify-content: space-between; align-items: center;">
+            <span id="tutorialCounter" style="font-size: 0.85rem; color: var(--dome-green); font-weight: bold; background: rgba(0, 122, 61, 0.1); padding: 4px 10px; border-radius: 12px; font-family: Tahoma, sans-serif;">1 من 5</span>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-secondary" onclick="endTutorial()" style="padding: 6px 12px; font-size: 0.85rem;">تخطي</button>
+                <button class="btn-primary" onclick="nextTutorialStep()" id="tutorialNextBtn" style="padding: 6px 12px; font-size: 0.85rem;">التالي</button>
+            </div>
         </div>
     </div>
 
     <!-- النوافذ -->
+    
+    <div id="newStudentModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px;">
+            <button class="close-modal-btn" onclick="closeModal('newStudentModal')">&times;</button>
+            <h3>👤 إنشاء ملف طالب جديد</h3>
+            <div class="form-group">
+                <label>الاسم الكامل للطالب</label>
+                <input type="text" id="newStudentNameInput" placeholder="اكتب اسم الطالب هنا...">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeModal('newStudentModal')">إلغاء</button>
+                <button class="btn-primary" onclick="createNewStudent()">فتح ملف الطالب</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteFolderWarningModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 350px;">
+            <h3 style="color: var(--danger); border-bottom: none;">تحذير خطير ⚠️</h3>
+            <p style="font-weight: bold;">هل أنت متأكد من حذف هذا المجلد؟</p>
+            <p style="color: var(--danger); font-size: 0.9rem;">سيتم حذف المجلد <b>وجميع الإجازات الموجودة بداخله</b> بشكل نهائي من السحابة ولن تتمكن من استعادتها.</p>
+            <div class="modal-actions" style="justify-content: center;">
+                <button class="btn-primary" style="background: var(--danger);" onclick="executeDeleteFolder()">نعم، احذف للأسف</button>
+                <button class="btn-secondary" onclick="closeModal('deleteFolderWarningModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
     <div id="deleteModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 350px;">
             <h3 style="color: var(--danger); border-bottom: none;">تأكيد الحذف</h3>
@@ -331,14 +361,16 @@
     <div id="renameFolderModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 400px;">
             <button class="close-modal-btn" onclick="closeModal('renameFolderModal')">&times;</button>
-            <h3>تغيير اسم الملف</h3>
+            <h3>تعديل المجلد</h3>
             <div class="form-group">
+                <label>اسم المجلد الجديد:</label>
                 <input type="text" id="renameFolderInput" placeholder="الاسم الجديد...">
                 <input type="hidden" id="renameFolderId">
             </div>
             <div class="modal-actions">
+                <button class="btn-primary" id="btnDeleteFolderInModal" style="background: var(--danger); margin-right: auto;" onclick="confirmDeleteFolder()">🗑️ حذف المجلد</button>
                 <button class="btn-secondary" onclick="closeModal('renameFolderModal')">إلغاء</button>
-                <button class="btn-primary" onclick="executeRenameFolder()">حفظ الاسم</button>
+                <button class="btn-primary" onclick="executeRenameFolder()">حفظ التعديل</button>
             </div>
         </div>
     </div>
@@ -403,19 +435,19 @@
             <button class="close-modal-btn" onclick="closeModal('settingsModal')">&times;</button>
             <h3>الإعدادات العامة للشهادات</h3>
             
-            <div class="form-group">
+            <div class="form-group" id="groupSettingsDate">
                 <label>تسمية حقل التاريخ</label>
                 <input type="text" id="set_dateLabel" value="تاريخ الإجازة:">
                 <div class="instructions">الكلمة التي تسبق التاريخ أسفل الشهادة.</div>
             </div>
             
-            <div class="form-group">
+            <div class="form-group" id="groupSettingsSheikh">
                 <label>بيانات المجيز (فوق التوقيع)</label>
                 <textarea id="set_sheikhDetails" rows="3">وكتب&#10;الخادم بمدراس الحنابلة&#10;صالح بن محمد الأسمري</textarea>
                 <div class="instructions">اكتب النص كما تريده أن يظهر، وسيتم الحفاظ على الأسطر.</div>
             </div>
             
-            <div class="form-group">
+            <div class="form-group" id="groupSettingsSig">
                 <label>صورة التوقيع (يفضل PNG شفاف)</label>
                 <input type="file" id="set_signatureUpload" accept="image/*" onchange="handleImageUpload(event, 'set_signaturePreview', 'signature')">
                 <div class="preview-box">
@@ -424,7 +456,7 @@
                 </div>
             </div>
             
-            <div class="form-group">
+            <div class="form-group" id="groupSettingsBg">
                 <label>خلفية الإجازة (صورة القالب A4)</label>
                 <input type="file" id="set_backgroundUpload" accept="image/*" onchange="handleImageUpload(event, 'set_backgroundPreview', 'background')">
                 <div class="preview-box" style="margin-bottom: 10px;">
@@ -433,7 +465,7 @@
                 </div>
             </div>
 
-            <div class="form-group" style="background: #fdfdfd; padding: 15px; border: 1px solid #eee; border-radius: 8px;">
+            <div class="form-group" id="groupSettingsMargins" style="background: #fdfdfd; padding: 15px; border: 1px solid #eee; border-radius: 8px;">
                 <label style="color: var(--dome-green); border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 15px;">تخصيص هوامش الكتابة (مساحة النص)</label>
                 <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
                     <div id="marginPreviewBg" style="width: 140px; aspect-ratio: 1/1.414; background-color: #e9ecef; background-size: 100% 100%; background-position: center; position: relative; border: 1px solid #ccc; border-radius: 4px; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
@@ -560,10 +592,10 @@
                 <div class="form-group" id="ijazahTextGroup">
                     <label>نص الإجازة (الخاص بهذا الملف)</label>
                     <div class="insert-btns-container">
-                        <button class="btn-insert" type="button" onclick="insertAtCursor('ijazahText', '{الاسم الكامل}')">الاسم كامل</button>
-                        <button class="btn-insert" type="button" onclick="insertAtCursor('ijazahText', '{الاسم الاول}')">الاسم الأول</button>
-                        <button class="btn-insert" type="button" onclick="insertAtCursor('ijazahText', '[]', true)">حاشية</button>
-                        <button class="btn-ai" type="button" onclick="openModal('aiDraftModal')" style="margin-right: auto;" title="توليد نص إجازة تلقائي">✨ صياغة ذكية</button>
+                        <button class="btn-insert" id="btnInsertFullName" type="button" onclick="insertAtCursor('ijazahText', '{الاسم الكامل}')">الاسم كامل</button>
+                        <button class="btn-insert" id="btnInsertFirstName" type="button" onclick="insertAtCursor('ijazahText', '{الاسم الاول}')">الاسم الأول</button>
+                        <button class="btn-insert" id="btnInsertFootnote" type="button" onclick="insertAtCursor('ijazahText', '[]', true)">حاشية</button>
+                        <button class="btn-ai" id="btnAiDraftInside" type="button" onclick="openModal('aiDraftModal')" style="margin-right: auto;" title="توليد نص إجازة تلقائي">✨ صياغة ذكية</button>
                     </div>
                     <textarea id="ijazahText" rows="6"></textarea>
                     
@@ -629,25 +661,46 @@
 
     <script>
         // ==========================================
-        // بيانات جولة الشرح التعليمية 
+        // محرك جولة الشرح التعليمية (المُحسن والعميق التفاعلي)
         // ==========================================
         const tutorialSteps = {
-            drive: [
-                { target: '#driveModeToggles', title: 'طرق العرض والتصنيف 🗂️', text: 'بإمكانك الآن عرض الخزانة إما بتصنيف المجلدات (الإجازات) كما هو معتاد، أو بتصنيف الطلاب لرؤية جميع إجازات كل طالب في مكان واحد.' },
-                { target: '#mainSearchContainer', title: 'البحث الشامل 🔍', text: 'من هنا يمكنك البحث، وإذا فعلت خيار "البحث في الإجازات"، سيقوم النظام بالبحث عن أي طالب لاستخراج شهادته فوراً!' },
-                { target: '#foldersGrid', title: 'مساحة الملفات 📁', text: 'هذه هي خزانتك الرئيسية. انقر على الزر الأول لإنشاء ملف جديد، أو انقر على أي ملف موجود لفتحه والعمل عليه.' },
-                { target: '#btnSettings', title: 'الإعدادات العامة ⚙️', text: 'هنا القلب النابض للنظام! ادخل لرفع صورة التوقيع الخاص بك، وخلفية الشهادة (القالب)، وضبط هوامش ومساحة الكتابة لتطبق على الإجازات.' }
+            masterDrive: [
+                { target: '#driveModeToggles', title: 'التصنيف الذكي 🗂️', text: 'بإمكانك عبر هذا الزر عرض الخزانة إما كمجلدات (حسب الإجازة) كما هو معتاد، أو بملفات الطلاب لرؤية جميع إجازات كل طالب في مكان واحد.' },
+                { target: '#searchInput', title: 'البحث السريع 🔍', text: 'اكتب هنا للبحث عن مجلد أو شهادة معينة.' },
+                { target: '#searchInCertsToggle', title: 'البحث الشامل في الشهادات', text: 'عند تفعيل هذا الخيار، سيقوم النظام بالبحث حتى داخل محتوى الشهادات عن أسماء الطلاب واستخراجها فوراً لك من جميع المجلدات!' },
+                { target: '#globalSortSelect', title: 'ترتيب العرض ⬇️', text: 'استخدم هذه القائمة لترتيب المجلدات أو الشهادات حسب الأحدث، الأقدم، أو أبجدياً.' },
+                { target: '#btnSettings', title: 'الإعدادات العامة ⚙️', text: 'دعنا نلقي نظرة على الإعدادات الآن لمعرفة كيف تضبط النظام.' },
+                { action: async () => { openModal('settingsModal'); }, delay: 300, target: '#groupSettingsDate', title: 'تسمية التاريخ', text: 'من هنا يمكنك تغيير الكلمة التي تسبق التاريخ في الشهادة (مثلاً: تاريخ الإجازة:، صدرت في:، إلخ).' },
+                { target: '#groupSettingsSheikh', title: 'بيانات المجيز 📝', text: 'اكتب هنا النص الذي سيظهر فوق التوقيع مباشرة (اسمك، صفتك، الخ).' },
+                { target: '#groupSettingsSig', title: 'صورة التوقيع 🖋️', text: 'ارفع صورة توقيعك هنا. يفضل أن تكون بصيغة PNG شفافة لتبدو رسمية وجميلة.' },
+                { target: '#groupSettingsBg', title: 'خلفية الإجازة 🖼️', text: 'هنا ترفع القالب الفارغ للشهادة. يجب أن يكون بحجم الورقة A4 (بالطول).' },
+                { target: '#groupSettingsMargins', title: 'المعايرة المرئية 📐', text: 'هذه أهم ميزة! استخدم المنزلقات الأربعة لتحريك المربع الأخضر بحيث يغطي تماماً المساحة الفارغة المخصصة للكتابة في قالبك، ليقوم النظام بحقن النص بداخلها بدقة.' },
+                { action: async () => { closeModal('settingsModal'); }, delay: 300, target: '#foldersGrid .add-folder-card', fallbackTarget: '#foldersGrid', title: 'مجلد جديد 📁', text: 'انقر هنا لإنشاء قالب إجازة لكتاب جديد وتبدأ العمل.' },
+                { target: '#foldersGrid .folder-card:nth-child(2) .edit-folder-btn', fallbackTarget: '#foldersGrid', title: 'تعديل أو حذف المجلد ✏️', text: 'بالتمرير فوق أي مجلد، سيظهر هذا الزر لتعديل اسمه، أو حذفه بالكامل (احذر فالحذف نهائي لجميع الإجازات داخله).' },
+                { action: async () => { if(folders.length > 0){ document.getElementById('renameFolderId').value=folders[0].id; document.getElementById('renameFolderInput').value=folders[0].name; openModal('renameFolderModal'); } }, delay: 300, target: '#btnDeleteFolderInModal', fallbackTarget: '#renameFolderModal .modal-content', title: 'الحذف النهائي 🗑️', text: 'زر الحذف العميق، سيقوم بمسح المجلد وكل ما فيه من السحابة للأبد.' },
+                { action: async () => { closeModal('renameFolderModal'); setDriveMode('students'); }, delay: 400, target: '#btnModeStudents', title: 'نظام ملفات الطلاب 👥', text: 'لقد انتقلنا الآن إلى وضع الطلاب. دعنا نرى ما بداخله.' },
+                { target: '#foldersGrid .add-folder-card', fallbackTarget: '#foldersGrid', title: 'طالب جديد 👤', text: 'من هنا يمكنك فتح ملف جديد لطالب مستقل قبل حتى أن تبدأ بإصدار الإجازات له.' },
+                { action: async () => { setDriveMode('folders'); }, delay: 300, target: '#foldersGrid', title: 'نهاية جولة الخزانة 🎉', text: 'انتهت جولة الشاشة الرئيسية! إذا أردت شرح شاشة "صنع الإجازة"، قم بالدخول لأي مجلد واضغط زر الشرح (❓) مرة أخرى.' }
             ],
             workspace: [
-                { target: '#dateGroup', title: 'تاريخ الإصدار 📅', text: 'أدخل هنا التاريخ الذي سيتم طباعته على الإجازات لهذه الدفعة.' },
-                { target: '#nameFormatGroup', title: 'نمط إدخال الأسماء ⚙️', text: 'حدد كيف ستقوم بإدخال الأسماء (سطرين للرغبة في إعراب الاسم الأول، أو سطر واحد).' },
-                { target: '#studentsListGroup', title: 'إدخال واستخراج الأسماء ✨', text: 'ألصق أسماء الطلاب هنا. واستخدم زر "استخراج ذكي" ليقوم الذكاء الاصطناعي بترتيب الأسماء المبعثرة تلقائياً!' },
-                { target: '#ijazahTextGroup', title: 'نص الإجازة 📝', text: 'اكتب الديباجة هنا. استخدم الأزرار العلوية لوضع المتغيرات. وانقر على "صياغة ذكية" ليقوم الذكاء الاصطناعي بتأليف النص.' },
-                { target: '#btnGenerateCerts', title: 'توليد الشهادات 🚀', text: 'بعد إكمال البيانات، اضغط هنا لتوليد الإجازات وتطبيق القالب والتوقيع في لمح البصر.' },
-                { target: '#normalControls', title: 'أدوات العرض والتحميل ☑️', text: 'للتبديل بين العرض المفصل والمصغر. استخدم زر "تحديد" لتتمكن من اختيار عدة إجازات وتحميلها معاً في ملف (ZIP).' },
-                { target: '#certificatesGrid .cert-card:not(.add-folder-card)', fallbackTarget: '#certificatesGrid', title: 'الشهادات المنجزة 📄', text: 'هنا ستظهر الإجازات التي قمت بتوليدها لمعاينتها.' },
-                { target: '#certificatesGrid .cert-card:not(.add-folder-card) .badge', fallbackTarget: '#certificatesGrid', title: 'حالة الملف 🏷️', text: 'يتغير نصه ولونه ليؤكد لك إذا قمت بتحميل الشهادة أم لا.' },
-                { target: '#certificatesGrid .cert-card:not(.add-folder-card) .individual-download-btns', fallbackTarget: '#certificatesGrid', title: 'أزرار التحميل 📥', text: 'لتحميل الشهادة بشكل فردي (PDF للطباعة، وصورة للمشاركة).' }
+                { target: '#ijazahDate', title: 'تاريخ الإصدار 📅', text: 'أدخل التاريخ المراد طباعته على الإجازات للدفعة التي ستعمل عليها الآن.' },
+                { target: '#nameFormat', title: 'نمط الأسماء ⚙️', text: 'اختر طريقة الإدخال. إذا كان قالبك يعتمد على إعراب الاسم (مثلاً: قد قرأ علي الأخ *محمد* وأجزتُ *محمداً*) فاختر "الاسم الكامل + الأول"، وسيتطلب منك إدخال كل طالب في سطرين.' },
+                { target: '#studentsListGroup .btn-ai', fallbackTarget: '#studentsListGroup', title: 'الاستخراج الذكي ✨', text: 'أنت لست مضطراً لترتيب الأسماء يدوياً! فقط الصق رسالة عشوائية تحتوي على الأسماء، واضغط هذا الزر ليقوم الذكاء الاصطناعي (Gemini) بتنظيفها وترتيبها في أسطر جاهزة للتوليد.' },
+                { target: '#studentsList', title: 'قائمة الطلاب 📝', text: 'هنا يتم وضع الأسماء النهائية للطلاب.' },
+                { target: '#btnInsertFullName', title: 'إدراج المتغيرات 🧩', text: 'عند كتابة الديباجة، اضغط هذا الزر ليضع رمز {الاسم الكامل} في المكان المناسب. النظام سيقوم باستبدال هذا الرمز باسم كل طالب على حدة أثناء التوليد.' },
+                { target: '#btnAiDraftInside', title: 'التأليف الذكي للشهادات ✨', text: 'إذا كنت لا تملك نصاً، دع الذكاء الاصطناعي يصيغ لك نص إجازة رصين وعلمي نيابة عنك!' },
+                { target: '#ijazahText', title: 'محرر النص 📝', text: 'هنا تكتب الديباجة. ميزة رائعة: لتمييز أي كلمة وتفخيمها، ضعها بين نجمتين هكذا *صحيح البخاري*.' },
+                { target: '#btnGenerateCerts', title: 'الصاروخ 🚀', text: 'بعد إكمال كل شيء، انقر هنا وسيتكفل النظام بالباقي.' },
+                { target: '#normalControls', title: 'التحكم والعرض ☑️', text: 'زر التحديد يتيح لك اختيار عدة شهادات. استخدمه لتحميل 50 شهادة مثلاً بملف ZIP مضغوط بضغطة زر واحدة.' },
+                { target: '#uploadBtnContainer', title: 'الإجازات السابقة ⬆️', text: 'إذا كان لديك ملفات PDF جاهزة، ارفعها هنا لتُحفظ في السحابة مع هذا المجلد.' },
+                { target: '#certificatesGrid .cert-card:not(.add-folder-card)', fallbackTarget: '#certificatesGrid', title: 'الشهادات المنجزة 📄', text: 'هنا تظهر الإجازات المولدة حديثاً للمعاينة.' },
+                { target: '#certificatesGrid .cert-card:not(.add-folder-card) .badge', fallbackTarget: '#certificatesGrid', title: 'حالة الحفظ والتحميل 🏷️', text: 'راقب هذا الوسم، سيتغير لونه ليوضح لك ما إذا قمت بتحميل الشهادة بالفعل أم لا.' },
+                { target: '#certificatesGrid .cert-card:not(.add-folder-card) .individual-download-btns', fallbackTarget: '#certificatesGrid', title: 'أزرار التحميل 📥', text: 'لتحميل شهادة واحدة بصيغة PDF أو كصورة للمشاركة عبر واتساب.' }
+            ],
+            workspaceStudent: [
+                { target: '#certificatesGrid .add-folder-card', fallbackTarget: '#certificatesGrid', title: 'إصدار شهادة للطالب ➕', text: 'انقر هنا لتفتح نافذة تختار منها (المجلد) وتصدر شهادة فورية لهذا الطالب بالتحديد.' },
+                { target: '#normalControls', title: 'التحميل المجمع ☑️', text: 'اضغط تحديد لاختيار بعض أو كل شهادات الطالب وتحميلها بملف واحد مضغوط.' },
+                { target: '#certificatesGrid .cert-card:not(.add-folder-card)', fallbackTarget: '#certificatesGrid', title: 'سجل الطالب 📄', text: 'هنا تُعرض جميع الإجازات التي حصل عليها الطالب، موضحاً اسم كل إجازة فوق اسمه.' }
             ]
         };
 
@@ -656,7 +709,22 @@
 
         function startTutorial() {
             const isWorkspace = document.getElementById('workspaceView').style.display === 'flex';
-            currentTutorialSequence = isWorkspace ? tutorialSteps.workspace : tutorialSteps.drive;
+            
+            // تنظيف أي حالة سابقة
+            closeModal('settingsModal');
+            closeModal('renameFolderModal');
+
+            if (isWorkspace) {
+                if (currentStudentModeName) {
+                    currentTutorialSequence = tutorialSteps.workspaceStudent; 
+                } else {
+                    currentTutorialSequence = tutorialSteps.workspace; 
+                }
+            } else {
+                setDriveMode('folders'); // ابدأ دائما من وضع المجلدات
+                currentTutorialSequence = tutorialSteps.masterDrive; 
+            }
+            
             currentTutorialStepIndex = 0;
 
             document.getElementById('tutorialOverlay').style.display = 'block';
@@ -666,8 +734,11 @@
             showTutorialStep();
         }
 
-        function showTutorialStep() {
-            document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
+        async function showTutorialStep() {
+            document.querySelectorAll('.tutorial-highlight').forEach(el => {
+                el.classList.remove('tutorial-highlight');
+                el.style.zIndex = '';
+            });
 
             if (currentTutorialStepIndex >= currentTutorialSequence.length) {
                 endTutorial();
@@ -675,6 +746,13 @@
             }
 
             const step = currentTutorialSequence[currentTutorialStepIndex];
+            
+            // تنفيذ الإجراء المرتبط بالخطوة (مثل فتح نافذة)
+            if (step.action) {
+                await step.action();
+                await new Promise(r => setTimeout(r, step.delay || 400));
+            }
+
             let targetEl = document.querySelector(step.target);
             if (!targetEl && step.fallbackTarget) {
                 targetEl = document.querySelector(step.fallbackTarget);
@@ -682,6 +760,9 @@
 
             document.getElementById('tutorialTitle').innerText = step.title;
             document.getElementById('tutorialContent').innerHTML = step.text;
+            
+            // تحديث عداد الخطوات
+            document.getElementById('tutorialCounter').innerText = `${currentTutorialStepIndex + 1} من ${currentTutorialSequence.length}`;
             
             const nextBtn = document.getElementById('tutorialNextBtn');
             nextBtn.innerText = currentTutorialStepIndex === currentTutorialSequence.length - 1 ? 'إنهاء الجولة' : 'التالي';
@@ -691,6 +772,7 @@
 
             if (targetEl) {
                 targetEl.classList.add('tutorial-highlight');
+                targetEl.style.zIndex = '10003'; // إجبار العنصر ليكون فوق التظليل
                 
                 const isHuge = targetEl.offsetHeight > window.innerHeight * 0.8;
                 targetEl.scrollIntoView({ behavior: 'smooth', block: isHuge ? 'start' : 'center' });
@@ -729,13 +811,27 @@
             }
         }
 
-        function nextTutorialStep() { currentTutorialStepIndex++; showTutorialStep(); }
+        function nextTutorialStep() { 
+            currentTutorialStepIndex++; 
+            showTutorialStep(); 
+        }
+        
         function endTutorial() {
-            document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
+            document.querySelectorAll('.tutorial-highlight').forEach(el => {
+                el.classList.remove('tutorial-highlight');
+                el.style.zIndex = '';
+            });
             document.getElementById('tutorialOverlay').style.display = 'none';
             const tooltip = document.getElementById('tutorialTooltip');
             tooltip.classList.remove('show');
             setTimeout(() => { tooltip.style.display = 'none'; tooltip.style.transform = 'none'; }, 300);
+            
+            // تنظيف بعد الجولة: إغلاق أي نوافذ قد تكون مفتوحة وإرجاع الوضع الافتراضي
+            closeModal('settingsModal');
+            closeModal('renameFolderModal');
+            if (document.getElementById('driveView').style.display !== 'none') {
+                setDriveMode('folders');
+            }
         }
 
         // ==========================================
@@ -922,7 +1018,6 @@
             }
             
             if (migrationNeeded) {
-                // ترقية الشهادات القديمة الخالية من النسبة الذهبية
                 setTimeout(() => {
                     let needsSave = false;
                     let certsToUpdate = [];
@@ -1104,6 +1199,9 @@
                     });
                 }
 
+                // زر طالب جديد
+                grid.innerHTML = `<div class="folder-card add-folder-card" onclick="openModal('newStudentModal')"><div class="add-icon">+</div><div class="folder-title">طالب جديد</div></div>`;
+
                 filteredStudents.forEach(student => {
                     const card = document.createElement('div'); card.className = 'folder-card'; card.onclick = () => openStudentFolder(student);
                     card.innerHTML = `<div class="folder-icon student-icon">👤</div><div class="folder-title">${student}</div>`;
@@ -1143,6 +1241,15 @@
             } else {
                 certsSection.style.display = 'none';
             }
+        }
+
+        // دوال الطالب الجديد
+        function createNewStudent() {
+            const name = document.getElementById('newStudentNameInput').value.trim();
+            if (!name) return showToast("الرجاء كتابة اسم الطالب", true);
+            closeModal('newStudentModal');
+            document.getElementById('newStudentNameInput').value = '';
+            openStudentFolder(name);
         }
 
         function openFolder(id) {
@@ -1345,6 +1452,34 @@
             if(document.getElementById('workspaceView').style.display === 'flex') { renderWorkspaceCerts(); }
         }
 
+        // --- دوال الحذف والتعديل للمجلد ---
+        function confirmDeleteFolder() {
+            closeModal('renameFolderModal');
+            openModal('deleteFolderWarningModal');
+        }
+
+        async function executeDeleteFolder() {
+            const folderId = document.getElementById('renameFolderId').value;
+            if (!folderId) return;
+
+            closeModal('deleteFolderWarningModal');
+
+            const certsToDelete = sessionCertificates.filter(c => c.folderId === folderId);
+            const certIdsToDelete = certsToDelete.map(c => c.id);
+
+            folders = folders.filter(f => f.id !== folderId);
+            sessionCertificates = sessionCertificates.filter(c => c.folderId !== folderId);
+
+            executeGlobalSearchAndSort();
+            showToast("تم حذف المجلد وما يحتويه بنجاح.");
+
+            saveLocalData();
+            saveGeneralDataToFirebase();
+            if (certIdsToDelete.length > 0) {
+                await deleteCertsFromFirebase(certIdsToDelete);
+            }
+        }
+
         function renameFolder(event, id) {
             event.stopPropagation(); const folder = folders.find(f => f.id === id); if (!folder) return;
             document.getElementById('renameFolderId').value = id; document.getElementById('renameFolderInput').value = folder.name; openModal('renameFolderModal');
@@ -1498,7 +1633,6 @@
 
             injectDynamicImages(grid);
             
-            // مراقبة كافة الشهادات لتطبيق النسبة دون أي تأخير
             document.querySelectorAll('#certificatesGrid .ijazah-template').forEach(t => certResizeObserver.observe(t));
         }
 
